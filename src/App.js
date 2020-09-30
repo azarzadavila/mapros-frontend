@@ -3,6 +3,9 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Col, Container, FormControl, Row} from "react-bootstrap";
 
+// const root_url = 'http://localhost:8000/';
+const root_url = 'https://mapros.herokuapp.com/';
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -23,8 +26,24 @@ class Login extends React.Component {
         this.setState({password: event.target.value});
     }
 
-    handleSubmit(event){
-        alert('Username ' + this.state.username + ' Password : ' + this.state.password);
+    handleSubmit(event) {
+        fetch(root_url + 'auth/',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username: this.state.username, password: this.state.password})
+            }).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            alert('Incorrect username or password');
+        }, networkError => {
+            console.log(networkError.message);
+        }).then(jsonResponse => {
+            console.log(jsonResponse);
+        });
         event.preventDefault();
     }
 
@@ -35,13 +54,15 @@ class Login extends React.Component {
                     <Row className={"justify-content-center"}>
                         <Col md={3}>
                             <label>Username</label>
-                            <FormControl className="mb-3" placeholder="Username" type="text" required value={this.state.username} onChange={this.handleChangeUsername}/>
+                            <FormControl className="mb-3" placeholder="Username" type="text" required
+                                         value={this.state.username} onChange={this.handleChangeUsername}/>
                         </Col>
                     </Row>
                     <Row className={"justify-content-center"}>
                         <Col md={3}>
                             <label>Password</label>
-                            <FormControl className="mb-3" placeholder="Password" type="password" required value={this.state.password} onChange={this.handleChangePassword}/>
+                            <FormControl className="mb-3" placeholder="Password" type="password" required
+                                         value={this.state.password} onChange={this.handleChangePassword}/>
                         </Col>
                     </Row>
                     <Row className={"justify-content-center"}>
