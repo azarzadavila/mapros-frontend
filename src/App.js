@@ -1,8 +1,10 @@
 import React from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Col, Container, FormControl, Row} from "react-bootstrap";
+import {Alert, Col, Container, FormControl, Row} from "react-bootstrap";
 import {Cookies} from "react-cookie";
+import {BrowserRouter as Router, Redirect, Route} from "react-router-dom";
+import Menu from './menu';
 
 
 // const root_url = 'http://localhost:8000/';
@@ -15,7 +17,9 @@ class Login extends React.Component {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            message: null,
+            redirect: null,
         };
         this.handleChangeUsername = this.handleChangeUsername.bind(this);
         this.handleChangePassword = this.handleChangePassword.bind(this);
@@ -42,22 +46,38 @@ class Login extends React.Component {
             if (response.ok) {
                 return response.json();
             }
-            throw new Error();
+            throw new Error('Username or password incorrect.');
         }, networkError => {
             console.log(networkError.message);
+            throw new Error(networkError.message);
         }).then(jsonResponse => {
-            console.log(jsonResponse);
-            cookies.set('token', jsonResponse.token);
+            if (jsonResponse) {
+                cookies.set('token', jsonResponse.token);
+                this.setState({redirect: '/menu/'});
+            }
         }).catch(error => {
-
+            const message = (
+                <Row className={"justify-content-center mb-3"}>
+                    <Col md={3}>
+                        <Alert variant="danger">
+                            {error.message}
+                        </Alert>
+                    </Col>
+                </Row>
+            );
+            this.setState({message: message});
         });
         event.preventDefault();
     }
 
     render() {
+        if (this.state.redirect) {
+            return <Redirect to={this.state.redirect}/>;
+        }
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
+                    {this.state.message}
                     <Row className={"justify-content-center"}>
                         <Col md={3}>
                             <label>Username</label>
@@ -107,22 +127,29 @@ class App extends React.Component {
         this.state = {
             main: <div></div>
         };
+    }
+
+    componentDidMount() {
         checkAuth().then(
             response => {
-                if (response) {
-                    console.log('positive response');
-                    this.setState({main: <div>Already Connected</div>});
-                } else {
-                    console.log('negative response');
-                    this.setState({main: <Login></Login>});
-                }
+                response ? this.setState({main: <Redirect to="/menu/"/>}) :
+                    this.setState({main: <Redirect to="login"/>});
             }
         );
     }
 
     render() {
-
-        return <Container>{this.state.main}</Container>
+        return (
+            <Router>
+                <Container>
+                    <Route exact={true} path="/" render={() => {
+                        return this.state.main;
+                    }}/>
+                    <Route path="/login/" component={Login}/>
+                    <Route path="/menu/" component={Menu}/>
+                </Container>
+            </Router>
+        )
     }
 }
 
