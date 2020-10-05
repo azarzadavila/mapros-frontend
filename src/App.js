@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container } from "react-bootstrap";
 import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
 import Menu from "./menu";
 import Login from "./Login";
@@ -47,17 +46,15 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <Container>
-          <Route
-            exact={true}
-            path="/"
-            render={() => {
-              return this.state.main;
-            }}
-          />
-          <Route path="/login/" component={Login} />
-          <Route path="/menu/" component={Menu} />
-        </Container>
+        <Route
+          exact={true}
+          path="/"
+          render={() => {
+            return this.state.main;
+          }}
+        />
+        <Route path="/login/" component={Login} />
+        <Route path="/menu/" component={Menu} />
       </Router>
     );
   }
