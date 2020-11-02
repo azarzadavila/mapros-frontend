@@ -54,11 +54,25 @@ function CheckSentence() {
         });
       });
   };
+  const handleTab = (event) => {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const start = event.target.selectionStart;
+      const end = event.target.selectionEnd;
+      setValue(value.substring(0, start) + "   " + value.substring(end));
+    }
+  };
   return (
     <Container>
       <Row>
         <Col>
-          <textarea className={"w-100"} onChange={handleChange} />
+          <textarea
+            className={"w-100"}
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleTab}
+            rows={20}
+          />
         </Col>
       </Row>
       <Row>
