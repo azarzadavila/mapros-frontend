@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
 import Menu from "./menu";
 import Login from "./Login";
+import CheckSentence from "./CheckSentence";
 import { cookies, ROOT_URL } from "./Constants";
 
 async function checkAuth() {
@@ -39,7 +40,7 @@ class App extends React.Component {
     checkAuth().then((response) => {
       response
         ? this.setState({ main: <Redirect to="/menu/" /> })
-        : this.setState({ main: <Redirect to="login" /> });
+        : this.setState({ main: <Redirect to="/login/" /> });
     });
   }
 
@@ -55,6 +56,7 @@ class App extends React.Component {
         />
         <Route path="/login/" component={Login} />
         <Route path="/menu/" component={Menu} />
+        <Route path="/check_sentence/" component={CheckSentence}/>
       </Router>
     );
   }
