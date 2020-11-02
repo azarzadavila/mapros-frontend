@@ -36,22 +36,22 @@ function CheckSentence() {
       .then(
         (response) => {
           if (!response.ok) {
-            throw response;
+            response.text().then((error) => {
+              console.log(error);
+            });
+            throw new Error("This is not a correct sentence !");
           }
         },
         (networkError) => {
           console.log(networkError.message);
-          errorPanel("Network Error");
+          throw new Error("Network Error");
         }
       )
       .then(() => {
         successPanel();
       })
       .catch((error) => {
-        error.text().then((response) => {
-          console.log(response);
-          errorPanel("This is not a correct sentence !");
-        });
+          errorPanel(error.message);
       });
   };
   const handleTab = (event) => {
