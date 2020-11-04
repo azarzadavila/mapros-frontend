@@ -39,6 +39,7 @@ function Menu() {
           name="Named Statements"
           img={logo_named_statements}
           alt="Named Statements logo"
+          link="/proof_editor/"
         />
         <MenuItem name="Contexts" img={logo_contexts} alt="Contexts logo" />
         <MenuItem

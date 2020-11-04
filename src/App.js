@@ -6,6 +6,7 @@ import Menu from "./menu";
 import Login from "./Login";
 import CheckSentence from "./CheckSentence";
 import { cookies, ROOT_URL } from "./Constants";
+import ProofEditor from "./ProofEditor";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -57,6 +58,7 @@ class App extends React.Component {
         <Route path="/login/" component={Login} />
         <Route path="/menu/" component={Menu} />
         <Route path="/check_sentence/" component={CheckSentence}/>
+        <Route path="/proof_editor/" component={ProofEditor}/>
       </Router>
     );
   }
