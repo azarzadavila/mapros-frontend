@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Card, Col, Container, Row, Button, Alert } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
+const format = require("xml-formatter");
 
 function SuccessLabel(props) {
-  return <Alert variant="primary" className={"w-100"}>{props.result}</Alert>;
+  return (
+    <Alert variant="primary" className={"w-100"}>
+      <pre>{props.result}</pre>
+    </Alert>
+  );
 }
 
 function FailLabel(props) {
@@ -40,7 +45,7 @@ function SentenceToXml() {
         }
       )
       .then((jsonResponse) => {
-        setLabelResult(<SuccessLabel result={jsonResponse.xml} />);
+        setLabelResult(<SuccessLabel result={format(jsonResponse.xml)} />);
       })
       .catch((error) => {
         setLabelResult(<FailLabel result={error.message} />);
