@@ -46,6 +46,7 @@ function Menu() {
           name="Definitions"
           img={logo_definitions}
           alt="Definitions logo"
+          link="/sentence_to_xml/"
         />
         <MenuItem name="Symbols" img={logo_symbols} alt="Symbols logo" />
         <MenuItem

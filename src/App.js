@@ -7,6 +7,7 @@ import Login from "./Login";
 import CheckSentence from "./CheckSentence";
 import { cookies, ROOT_URL } from "./Constants";
 import ProofEditor from "./ProofEditor";
+import SentenceToXml from "./SentenceToXml";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -59,6 +60,7 @@ class App extends React.Component {
         <Route path="/menu/" component={Menu} />
         <Route path="/check_sentence/" component={CheckSentence}/>
         <Route path="/proof_editor/" component={ProofEditor}/>
+        <Route path="/sentence_to_xml/" component={SentenceToXml}/>
       </Router>
     );
   }
