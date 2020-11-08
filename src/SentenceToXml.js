@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Col, Container, Row, Button, Alert } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
+import { textToXML } from "./FormalCommunication";
 const format = require("xml-formatter");
 
 function SuccessLabel(props) {
@@ -24,28 +25,9 @@ function SentenceToXml() {
   const [sentence, setSentence] = useState("");
   const transformToXml = (event) => {
     setLabelResult(<></>);
-    fetch(ROOT_URL + "text_to_xml/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sentence: sentence,
-      }),
-    })
-      .then(
-        (response) => {
-          if (!response.ok) {
-            throw new Error("Conversion failed");
-          }
-          return response.json();
-        },
-        (networkError) => {
-          throw new Error("Network error");
-        }
-      )
-      .then((jsonResponse) => {
-        setLabelResult(<SuccessLabel result={format(jsonResponse.xml)} />);
+    textToXML(sentence)
+      .then((response) => {
+        setLabelResult(<SuccessLabel result={format(response.data.xml)} />);
       })
       .catch((error) => {
         setLabelResult(<FailLabel result={error.message} />);

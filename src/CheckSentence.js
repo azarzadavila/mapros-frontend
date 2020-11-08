@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Col, Container, Row, Button, Alert } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
+import { checkSentenceProof, checkSentenceXML } from "./FormalCommunication";
 
 function CheckSentence() {
   const [value, setValue] = useState("");
@@ -24,34 +25,12 @@ function CheckSentence() {
   };
   const submitSentence = () => {
     setLabelPanel(<></>);
-    fetch(ROOT_URL + "check_sentence/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        xml: value,
-      }),
-    })
-      .then(
-        (response) => {
-          if (!response.ok) {
-            response.text().then((error) => {
-              console.log(error);
-            });
-            throw new Error("This is not a correct sentence !");
-          }
-        },
-        (networkError) => {
-          console.log(networkError.message);
-          throw new Error("Network Error");
-        }
-      )
-      .then(() => {
+    checkSentenceXML(value)
+      .then((response) => {
         successPanel();
       })
       .catch((error) => {
-          errorPanel(error.message);
+        errorPanel(error.message);
       });
   };
   const handleTab = (event) => {

@@ -13,6 +13,40 @@ import {
 import { ROOT_URL } from "./Constants";
 const axios = require("axios").default;
 
+class SentenceProof {
+  constructor(rule, proofs, args) {
+    this.rule = rule;
+    this.proofs = proofs;
+    this.args = args;
+  }
+}
+class Proof {
+  constructor(sentence) {
+    this.sentence = sentence;
+    this.sentence_proof = null;
+    this.children = [];
+  }
+  push(child) {
+    this.children.push(child);
+  }
+}
+
+export function checkSentenceXML(xml) {
+  return axios.post(ROOT_URL + "check_sentence/", { xml: xml });
+}
+
+export function textToXML(sentence) {
+  return axios.post(ROOT_URL + "text_to_xml/", { sentence: sentence });
+}
+
+export function checkSentenceProof(sentenceProof) {
+  return axios.post(ROOT_URL + "check_sentence_proof/", sentenceProof);
+}
+
+export function checkStandalone(proof) {
+  return axios.post(ROOT_URL + "check_standalone/", proof);
+}
+
 export function FormalCommuncation() {
   const [value, setValue] = useState("");
   const [url, setURL] = useState("");
