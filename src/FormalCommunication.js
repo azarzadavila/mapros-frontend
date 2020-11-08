@@ -11,28 +11,7 @@ import {
   FormGroup,
 } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
-
-export async function post(url, content) {
-  return fetch(ROOT_URL + url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(content),
-  }).then(
-    (response) => {
-      if (!response.ok) {
-        throw response.json();
-      }
-      return response.json().catch((error) => {
-        return {};
-      });
-    },
-    (networkError) => {
-      throw { networkError: networkError.message };
-    }
-  );
-}
+const axios = require("axios").default;
 
 export function FormalCommuncation() {
   const [value, setValue] = useState("");
@@ -46,16 +25,26 @@ export function FormalCommuncation() {
   };
   const send = (event) => {
     try {
-      post(url, value)
+      const data = JSON.parse(value);
+      axios
+        .post(ROOT_URL + url, data)
         .then((response) => {
           setLabelResult(
             <Alert variant="success" className="w-100">
+              <em>Status Code : {response.status}</em>
+              <br />
+              {JSON.stringify(response.data)}
             </Alert>
           );
         })
         .catch((error) => {
           setLabelResult(
             <Alert variant="danger" className="w-100">
+              <span>{error.message}</span>
+              <br />
+              <em>Status Code : {error.response.status}</em>
+              <br />
+              {JSON.stringify(error.response.data)}
             </Alert>
           );
         });
