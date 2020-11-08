@@ -6,7 +6,12 @@ import logo_contexts from "./img/x-diamond-fill.svg";
 import logo_definitions from "./img/book-fill.svg";
 import logo_symbols from "./img/pi.svg";
 import "./menu.css";
-import { BrowserRouter as Router, Redirect, Route, Link} from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Link,
+} from "react-router-dom";
 
 function MenuItem(props) {
   return (
@@ -54,6 +59,12 @@ function Menu() {
           img={logo_symbols}
           alt="Symbols logo"
           link="/check_sentence/"
+        />
+        <MenuItem
+          name="StandAlone Proof"
+          img={logo_symbols}
+          alt="Symbols logo"
+          link="/standalone_proof/"
         />
       </Row>
     </Container>
