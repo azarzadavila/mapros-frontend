@@ -9,6 +9,7 @@ import {
   Form,
   FormControl,
   FormGroup,
+  InputGroup,
 } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
 
@@ -35,20 +36,25 @@ function Sentence(props) {
       children.concat([
         <Sentence
           tab={props.tab + 1}
-          number={children.length + 1}
+          number={`${props.number}.${children.length + 1}`}
           idx={children.length + 1}
         />,
       ])
     );
   };
+  const spaceStyle = {
+    "margin-left": props.tab.toString() + "%",
+  };
   return (
     <>
-      <Row>
-        <Col xs={{ span: 1, offset: props.tab }}>
-          <Form.Label>{props.number}</Form.Label>
-        </Col>
-        <Col xs={10 - props.tab}>
-          <Form.Control type="text" onChange={handleValue} value={value} />
+      <Row style={spaceStyle} className="mt-3">
+        <Col xs={11}>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text>{props.number}</InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control type="text" onChange={handleValue} value={value} />
+          </InputGroup>
         </Col>
         <Col xs={1}>
           <Button variant="primary" onClick={addChild}>
@@ -56,33 +62,39 @@ function Sentence(props) {
           </Button>
         </Col>
       </Row>
-      {children}
-      <Row>
-        <Col xs={{ span: 2, offset: props.tab }}>
-          <Form.Label>Proof:</Form.Label>
-        </Col>
-        <Col xs={10 - props.tab}>
-          <Form.Control
-            type="text"
-            onChange={handleProofSentence}
-            value={proofSentence}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={{ span: 2, offset: props.tab }}>
-          <Form.Label>By using:</Form.Label>
-        </Col>
-        <Col xs={10 - props.tab}>
-          <Form.Control type="text" onChange={handleProofs} value={proofs} />
+      <div>{children}</div>
+      <Row style={spaceStyle} className="mt-3">
+        <Col xs={12}>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text>Proof</InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control
+              type="text"
+              onChange={handleProofSentence}
+              value={proofSentence}
+            />
+          </InputGroup>
         </Col>
       </Row>
-      <Row>
-        <Col xs={{ span: 2, offset: props.tab }}>
-          <Form.Label>Args:</Form.Label>
+      <Row style={spaceStyle}>
+        <Col xs={12}>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text>By using</InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control type="text" onChange={handleProofs} value={proofs} />
+          </InputGroup>
         </Col>
-        <Col xs={10 - props.tab}>
-          <Form.Control type="text" onChange={handleArgs} value={args} />
+      </Row>
+      <Row style={spaceStyle}>
+        <Col xs={12}>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text>Args</InputGroup.Text>
+            </InputGroup.Prepend>
+            <Form.Control type="text" onChange={handleArgs} value={args} />
+          </InputGroup>
         </Col>
       </Row>
     </>
@@ -92,7 +104,7 @@ function Sentence(props) {
 function StandAloneProof() {
   return (
     <Container>
-      <Sentence tab={0} />
+      <Sentence tab={0} number={1} />
     </Container>
   );
 }
