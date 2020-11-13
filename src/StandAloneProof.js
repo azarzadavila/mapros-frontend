@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useReducer, useState } from "react";
 import {
   Card,
   Col,
@@ -13,7 +13,11 @@ import {
 } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
 
+let last = 0;
+const StandAloneProofDispatch = React.createContext(null);
+
 function Sentence(props) {
+  const dispatch = useContext(StandAloneProofDispatch);
   const [value, setValue] = useState("");
   const [proofSentence, setProofSentence] = useState("");
   const [proofs, setProofs] = useState("");
@@ -21,6 +25,7 @@ function Sentence(props) {
   const [children, setChildren] = useState([]);
   const handleValue = (event) => {
     setValue(event.target.value);
+    dispatch({ idx: props.idx, value: event.target.value });
   };
   const handleProofSentence = (event) => {
     setProofSentence(event.target.value);
@@ -32,12 +37,14 @@ function Sentence(props) {
     setArgs(event.target.value);
   };
   const addChild = (event) => {
+    last += 1;
     setChildren(
       children.concat([
         <Sentence
           tab={props.tab + 1}
           number={`${props.number}.${children.length + 1}`}
-          idx={children.length + 1}
+          idx={last}
+          key={last}
         />,
       ])
     );
@@ -101,11 +108,23 @@ function Sentence(props) {
   );
 }
 
+function standAloneProofReducer(state, action) {
+  const idx = action.idx;
+  const idxState = Object.assign({}, state[idx], { sentence: action.value });
+  const source2 = {};
+  source2[idx] = idxState;
+  return Object.assign({}, state, source2);
+}
+
+const initialState = { 0: { sentence: "" } };
 function StandAloneProof() {
+  const [state, dispatch] = useReducer(standAloneProofReducer, initialState);
   return (
-    <Container>
-      <Sentence tab={0} number={1} />
-    </Container>
+    <StandAloneProofDispatch.Provider value={dispatch}>
+      <Container>
+        <Sentence tab={0} number={1} idx={0} />
+      </Container>
+    </StandAloneProofDispatch.Provider>
   );
 }
 

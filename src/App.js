@@ -13,7 +13,7 @@ import StandAloneProof1 from "./StandAloneProof1";
 import StandAloneProof2 from "./StandAloneProof2";
 import StandAloneProof3 from "./StandAloneProof3";
 import StandAloneProof4 from "./StandAloneProof4";
-import {FormalCommuncation} from "./FormalCommunication";
+import { FormalCommuncation } from "./FormalCommunication";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -64,11 +64,12 @@ class App extends React.Component {
         />
         <Route path="/login/" component={Login} />
         <Route path="/menu/" component={Menu} />
-        <Route path="/check_sentence/" component={CheckSentence}/>
-        <Route path="/proof_editor/" component={ProofEditor}/>
-        <Route path="/sentence_to_xml/" component={SentenceToXml}/>
-        <Route path="/standalone_proof/" component={StandAloneProof4}/>
-        <Route path="/api-test/" component={FormalCommuncation}/>
+        <Route path="/check_sentence/" component={CheckSentence} />
+        <Route path="/proof_editor/" component={ProofEditor} />
+        <Route path="/sentence_to_xml/" component={SentenceToXml} />
+        <Route path="/standalone_proof/" component={StandAloneProof4} />
+        <Route path="/standalone_proof2/" component={StandAloneProof} />
+        <Route path="/api-test/" component={FormalCommuncation} />
       </Router>
     );
   }
