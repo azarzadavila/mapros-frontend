@@ -9,6 +9,10 @@ import { cookies, ROOT_URL } from "./Constants";
 import ProofEditor from "./ProofEditor";
 import SentenceToXml from "./SentenceToXml";
 import StandAloneProof from "./StandAloneProof";
+import StandAloneProof1 from "./StandAloneProof1";
+import StandAloneProof2 from "./StandAloneProof2";
+import StandAloneProof3 from "./StandAloneProof3";
+import StandAloneProof4 from "./StandAloneProof4";
 import {FormalCommuncation} from "./FormalCommunication";
 
 async function checkAuth() {
@@ -63,7 +67,7 @@ class App extends React.Component {
         <Route path="/check_sentence/" component={CheckSentence}/>
         <Route path="/proof_editor/" component={ProofEditor}/>
         <Route path="/sentence_to_xml/" component={SentenceToXml}/>
-        <Route path="/standalone_proof/" component={StandAloneProof}/>
+        <Route path="/standalone_proof/" component={StandAloneProof4}/>
         <Route path="/api-test/" component={FormalCommuncation}/>
       </Router>
     );
