@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   Card,
   Col,
@@ -14,43 +14,48 @@ import {
 import { ROOT_URL } from "./Constants";
 
 let last = 0;
-const StandAloneProofDispatch = React.createContext(null);
 
-function Sentence(props) {
-  const dispatch = useContext(StandAloneProofDispatch);
-  const [value, setValue] = useState("");
-  const [proofSentence, setProofSentence] = useState("");
-  const [proofs, setProofs] = useState("");
-  const [args, setArgs] = useState("");
-  const [children, setChildren] = useState([]);
-  const handleValue = (event) => {
-    setValue(event.target.value);
-    dispatch({ idx: props.idx, value: event.target.value });
+function Proof({ proof, onChange, tab, numLabel }) {
+  const spaceStyle = {
+    marginLeft: tab.toString() + "%",
   };
-  const handleProofSentence = (event) => {
-    setProofSentence(event.target.value);
+  const handleSentence = (event) => {
+    const newProof = { ...proof };
+    newProof.sentence = event.target.value;
+    onChange(newProof);
   };
-  const handleProofs = (event) => {
-    setProofs(event.target.value);
+  const handleSentenceProofRule = (event) => {
+    const newProof = { ...proof };
+    newProof.sentenceProofRule = event.target.value;
+    onChange(newProof);
   };
-  const handleArgs = (event) => {
-    setArgs(event.target.value);
+  const handleSentenceProofProofs = (event) => {
+    const newProof = { ...proof };
+    newProof.sentenceProofProofs = event.target.value;
+    onChange(newProof);
+  };
+  const handleSentenceProofArgs = (event) => {
+    const newProof = { ...proof };
+    newProof.sentenceProofArgs = event.target.value;
+    onChange(newProof);
+  };
+  const handleChildrenChange = (index, childProof) => {
+    const newProof = { ...proof };
+    newProof.children[index] = childProof;
+    onChange(newProof);
   };
   const addChild = (event) => {
     last += 1;
-    setChildren(
-      children.concat([
-        <Sentence
-          tab={props.tab + 1}
-          number={`${props.number}.${children.length + 1}`}
-          idx={last}
-          key={last}
-        />,
-      ])
-    );
-  };
-  const spaceStyle = {
-    "margin-left": props.tab.toString() + "%",
+    const newProof = { ...proof };
+    newProof.children.push({
+      children: [],
+      sentence: "",
+      sentenceProofRule: "",
+      sentenceProofProofs: "",
+      sentenceProofArgs: "",
+      key: last,
+    });
+    onChange(newProof);
   };
   return (
     <>
@@ -58,9 +63,13 @@ function Sentence(props) {
         <Col xs={11}>
           <InputGroup>
             <InputGroup.Prepend>
-              <InputGroup.Text>{props.number}</InputGroup.Text>
+              <InputGroup.Text>{numLabel}</InputGroup.Text>
             </InputGroup.Prepend>
-            <Form.Control type="text" onChange={handleValue} value={value} />
+            <Form.Control
+              type="text"
+              onChange={handleSentence}
+              value={proof.sentence}
+            />
           </InputGroup>
         </Col>
         <Col xs={1}>
@@ -69,7 +78,21 @@ function Sentence(props) {
           </Button>
         </Col>
       </Row>
-      <div>{children}</div>
+      <div>
+        {proof.children.map((child, index) => {
+          return (
+            <Proof
+              proof={child}
+              onChange={(proof) => {
+                handleChildrenChange(index, proof);
+              }}
+              tab={tab + 1}
+              numLabel={numLabel + (index + 1).toString() + "."}
+              key={child.key}
+            />
+          );
+        })}
+      </div>
       <Row style={spaceStyle} className="mt-3">
         <Col xs={12}>
           <InputGroup>
@@ -78,8 +101,8 @@ function Sentence(props) {
             </InputGroup.Prepend>
             <Form.Control
               type="text"
-              onChange={handleProofSentence}
-              value={proofSentence}
+              onChange={handleSentenceProofRule}
+              value={proof.sentenceProofRule}
             />
           </InputGroup>
         </Col>
@@ -90,7 +113,11 @@ function Sentence(props) {
             <InputGroup.Prepend>
               <InputGroup.Text>By using</InputGroup.Text>
             </InputGroup.Prepend>
-            <Form.Control type="text" onChange={handleProofs} value={proofs} />
+            <Form.Control
+              type="text"
+              onChange={handleSentenceProofProofs}
+              value={proof.sentenceProofProofs}
+            />
           </InputGroup>
         </Col>
       </Row>
@@ -100,7 +127,11 @@ function Sentence(props) {
             <InputGroup.Prepend>
               <InputGroup.Text>Args</InputGroup.Text>
             </InputGroup.Prepend>
-            <Form.Control type="text" onChange={handleArgs} value={args} />
+            <Form.Control
+              type="text"
+              onChange={handleSentenceProofArgs}
+              value={proof.sentenceProofArgs}
+            />
           </InputGroup>
         </Col>
       </Row>
@@ -108,24 +139,27 @@ function Sentence(props) {
   );
 }
 
-function standAloneProofReducer(state, action) {
-  const idx = action.idx;
-  const idxState = Object.assign({}, state[idx], { sentence: action.value });
-  const source2 = {};
-  source2[idx] = idxState;
-  return Object.assign({}, state, source2);
-}
-
-const initialState = { 0: { sentence: "" } };
-function StandAloneProof() {
-  const [state, dispatch] = useReducer(standAloneProofReducer, initialState);
+function StandAloneProof5() {
+  const [proof, setProof] = useState({
+    children: [],
+    sentence: "",
+    sentenceProofRule: "",
+    sentenceProofProofs: "",
+    sentenceProofArgs: "",
+    key: last,
+  });
   return (
-    <StandAloneProofDispatch.Provider value={dispatch}>
-      <Container>
-        <Sentence tab={0} number={1} idx={0} />
-      </Container>
-    </StandAloneProofDispatch.Provider>
+    <Container>
+      <Proof
+        proof={proof}
+        onChange={(proof) => {
+          setProof(proof);
+        }}
+        tab={0}
+        numLabel=""
+      />
+    </Container>
   );
 }
 
-export default StandAloneProof;
+export default StandAloneProof5;
