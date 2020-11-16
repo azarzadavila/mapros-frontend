@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
 import { textToXML } from "./FormalCommunication";
-import { Proof as ProofObj } from "./FormalCommunication";
+import { Proof as ProofObj, SentenceProof } from "./FormalCommunication";
 
 let last = 0;
 
@@ -141,10 +141,24 @@ function Proof({ proof, onChange, tab, numLabel }) {
   );
 }
 
+function buildSentenceProof(proof) {
+  const rule = proof.sentenceProofRule.trim().replace(" ", "");
+  let proofsStr = proof.sentenceProofProofs.trim().replace(" ", "").split(",");
+  const proofs = [];
+  for (let s of proofsStr) {
+    const indexes = s.split(".");
+    proofs.push(indexes.map((index) => parseInt(index) - 1));
+  }
+  const args = proof.sentenceProofArgs.trim().replace(" ", "").split(",");
+  return new SentenceProof(rule, proofs, args);
+}
+
 async function buildProof(proof) {
   try {
     const xml = await textToXML(proof.sentence);
     const proofObj = new ProofObj(xml);
+    proofObj.sentence_proof = buildSentenceProof(proof);
+    console.log(proofObj.sentence_proof);
     for (let child of proof.children) {
       proofObj.push(await buildProof(child));
     }
