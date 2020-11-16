@@ -13,6 +13,12 @@ import {
 import { ROOT_URL } from "./Constants";
 const axios = require("axios").default;
 
+export class Sentence {
+  constructor(xml) {
+    this.xml = xml;
+  }
+}
+
 export class SentenceProof {
   constructor(rule, proofs, args) {
     this.rule = rule;

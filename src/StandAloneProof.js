@@ -1,19 +1,12 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useState } from "react";
+import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import {
-  Card,
-  Col,
-  Container,
-  Row,
-  Button,
-  Alert,
-  Form,
-  FormControl,
-  FormGroup,
-  InputGroup,
-} from "react-bootstrap";
-import { ROOT_URL } from "./Constants";
-import { textToXML } from "./FormalCommunication";
-import { Proof as ProofObj, SentenceProof } from "./FormalCommunication";
+  checkStandalone,
+  Proof as ProofObj,
+  Sentence,
+  SentenceProof,
+  textToXML,
+} from "./FormalCommunication";
 
 let last = 0;
 
@@ -143,22 +136,42 @@ function Proof({ proof, onChange, tab, numLabel }) {
 
 function buildSentenceProof(proof) {
   const rule = proof.sentenceProofRule.trim().replace(" ", "");
-  let proofsStr = proof.sentenceProofProofs.trim().replace(" ", "").split(",");
+  let proofsStr = proof.sentenceProofProofs
+    .trim()
+    .replace(" ", "")
+    .split(",")
+    .filter((s) => {
+      return s !== "";
+    });
   const proofs = [];
   for (let s of proofsStr) {
     const indexes = s.split(".");
-    proofs.push(indexes.map((index) => parseInt(index) - 1));
+    proofs.push(
+      indexes.map((index) => {
+        const toRet = parseInt(index) - 1;
+        if (isNaN(toRet)) {
+          throw new Error("incorrect proofs to use");
+        }
+        return toRet;
+      })
+    );
   }
-  const args = proof.sentenceProofArgs.trim().replace(" ", "").split(",");
+  const args = proof.sentenceProofArgs
+    .trim()
+    .replace(" ", "")
+    .split(",")
+    .filter((s) => {
+      return s !== "";
+    });
+  console.log(proofs);
   return new SentenceProof(rule, proofs, args);
 }
 
 async function buildProof(proof) {
   try {
-    const xml = await textToXML(proof.sentence);
-    const proofObj = new ProofObj(xml);
+    const xml = (await textToXML(proof.sentence)).data.xml;
+    const proofObj = new ProofObj(new Sentence(xml));
     proofObj.sentence_proof = buildSentenceProof(proof);
-    console.log(proofObj.sentence_proof);
     for (let child of proof.children) {
       proofObj.push(await buildProof(child));
     }
@@ -170,12 +183,19 @@ async function buildProof(proof) {
 
 function checkProof(root) {
   buildProof(root)
-    .then(() => {
-      console.log("success");
+    .then((response) => {
+      return checkStandalone(response);
+    })
+    .then((response) => {
+      if (response.data.status) {
+        console.log("success");
+      } else {
+        console.log("Failed");
+      }
     })
     .catch((e) => {
       console.log(e.message);
-      if (e.response.data) {
+      if (e.response) {
         console.log(e.response.data);
       }
     });
