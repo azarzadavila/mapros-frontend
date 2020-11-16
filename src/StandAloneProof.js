@@ -12,6 +12,8 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import { ROOT_URL } from "./Constants";
+import { textToXML } from "./FormalCommunication";
+import { Proof as ProofObj } from "./FormalCommunication";
 
 let last = 0;
 
@@ -139,6 +141,32 @@ function Proof({ proof, onChange, tab, numLabel }) {
   );
 }
 
+async function buildProof(proof) {
+  try {
+    const xml = await textToXML(proof.sentence);
+    const proofObj = new ProofObj(xml);
+    for (let child of proof.children) {
+      proofObj.push(await buildProof(child));
+    }
+    return proofObj;
+  } catch (e) {
+    throw e;
+  }
+}
+
+function checkProof(root) {
+  buildProof(root)
+    .then(() => {
+      console.log("success");
+    })
+    .catch((e) => {
+      console.log(e.message);
+      if (e.response.data) {
+        console.log(e.response.data);
+      }
+    });
+}
+
 function StandAloneProof5() {
   const [proof, setProof] = useState({
     children: [],
@@ -158,6 +186,19 @@ function StandAloneProof5() {
         tab={0}
         numLabel=""
       />
+      <Row>
+        <Col>
+          <Button
+            variant="primary"
+            className="mt-3 w-100"
+            onClick={() => {
+              checkProof(proof);
+            }}
+          >
+            Check Proof
+          </Button>
+        </Col>
+      </Row>
     </Container>
   );
 }

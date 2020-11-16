@@ -13,14 +13,14 @@ import {
 import { ROOT_URL } from "./Constants";
 const axios = require("axios").default;
 
-class SentenceProof {
+export class SentenceProof {
   constructor(rule, proofs, args) {
     this.rule = rule;
     this.proofs = proofs;
     this.args = args;
   }
 }
-class Proof {
+export class Proof {
   constructor(sentence) {
     this.sentence = sentence;
     this.sentence_proof = null;
