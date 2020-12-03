@@ -66,6 +66,12 @@ function Menu() {
           alt="Symbols logo"
           link="/standalone_proof/"
         />
+        <MenuItem
+          name="Test MathQuill"
+          img={logo_symbols}
+          alt="Symbols logo"
+          link="/mathquill/"
+        />
       </Row>
     </Container>
   );
