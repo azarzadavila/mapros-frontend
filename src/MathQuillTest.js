@@ -10,7 +10,13 @@ const MathQuillTest = () => {
   const getChangeInput = (index) => {
     return (event) => {
       const newInputs = inputs.slice();
-      newInputs[index].value = event.target.value;
+      let newValue = "";
+      if (index % 2 === 0) {
+        newValue = event.target.value;
+      } else {
+        newValue = event.latex();
+      }
+      newInputs[index].value = newValue;
       setInputs(newInputs);
     };
   };
@@ -21,8 +27,11 @@ const MathQuillTest = () => {
     return (event) => {
       if (event.ctrlKey && event.keyCode === 13) {
         const inputsStart = inputs.slice(0, index + 1);
-        id = id + 1;
-        const newInput = [{ id: id, value: "" }];
+        const newInput = [
+          { id: id + 1, value: "" },
+          { id: id + 2, value: "" },
+        ];
+        id += 2;
         const inputEnd = inputs.slice(index + 1, inputs.length);
         const newInputs = inputsStart.concat(newInput, inputEnd);
         console.log(newInputs);
@@ -50,15 +59,28 @@ const MathQuillTest = () => {
       </Row>
       <Row>
         <InputGroup>
-          {inputs.map((inputObj, i) => (
-            <input
-              key={inputObj.id}
-              type={"text"}
-              value={inputObj.value}
-              onChange={getChangeInput(i)}
-              onKeyDown={getKeyDown(i)}
-            />
-          ))}
+          {inputs.map((inputObj, i) => {
+            if (i % 2 === 0) {
+              return (
+                <input
+                  key={inputObj.id}
+                  type={"text"}
+                  value={inputObj.value}
+                  onChange={getChangeInput(i)}
+                  onKeyDown={getKeyDown(i)}
+                  size={inputObj.value.length + 1}
+                />
+              );
+            } else {
+              return (
+                <EditableMathField
+                  key={inputObj.id}
+                  latex={inputObj.value}
+                  onChange={getChangeInput(i)}
+                />
+              );
+            }
+          })}
         </InputGroup>
       </Row>
     </Container>
