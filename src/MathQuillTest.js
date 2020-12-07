@@ -5,20 +5,27 @@ addStyles();
 let id = 0;
 const initialState = [{ id: 0, value: "" }];
 function reducer(state, action) {
+  let start, middle, end, newState;
   switch (action.type) {
     case "update":
-      const newState = state.slice();
+      newState = state.slice();
       newState[action.index].value = action.value;
       return newState;
     case "add":
-      const start = state.slice(0, action.index + 1);
-      const middle = [
+      start = state.slice(0, action.index + 1);
+      middle = [
         { id: id + 1, value: "" },
         { id: id + 2, value: "" },
       ];
       id += 2;
-      const end = state.slice(action.index + 1, state.length);
+      end = state.slice(action.index + 1, state.length);
       return start.concat(middle, end);
+    case "delete":
+      start = state.slice(0, action.index);
+      start[action.index - 1].value += " ";
+      start[action.index - 1].value += state[action.index + 1].value;
+      end = state.slice(action.index + 2, state.length);
+      return start.concat(end);
     default:
       throw new Error();
   }
@@ -37,11 +44,19 @@ const MathQuillTest = () => {
     }
   };
   const getKeyDown = (index) => {
-    return (event) => {
-      if (event.ctrlKey && event.keyCode === 13) {
-        dispatch({ type: "add", index: index });
-      }
-    };
+    if (index % 2 === 0) {
+      return (event) => {
+        if (event.ctrlKey && event.keyCode === 13) {
+          dispatch({ type: "add", index: index });
+        }
+      };
+    } else {
+      return (event) => {
+        if (event.keyCode === 8 && state[index].value === "") {
+          dispatch({ type: "delete", index: index });
+        }
+      };
+    }
   };
   return (
     <Container>
@@ -64,6 +79,7 @@ const MathQuillTest = () => {
                   key={inputObj.id}
                   latex={inputObj.value}
                   onChange={getChangeInput(index)}
+                  onKeyDown={getKeyDown(index)}
                 />
               );
             }
