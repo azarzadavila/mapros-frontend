@@ -26,9 +26,15 @@ function reducer(state, action) {
 const MathQuillTest = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const getChangeInput = (index) => {
-    return (event) => {
-      dispatch({ type: "update", index: index, value: event.target.value });
-    };
+    if (index % 2 === 0) {
+      return (event) => {
+        dispatch({ type: "update", index: index, value: event.target.value });
+      };
+    } else {
+      return (mathField) => {
+        dispatch({ type: "update", index: index, value: mathField.latex() });
+      };
+    }
   };
   const getKeyDown = (index) => {
     return (event) => {
@@ -42,15 +48,25 @@ const MathQuillTest = () => {
       <Row>
         <InputGroup>
           {state.map((inputObj, index) => {
-            return (
-              <input
-                key={inputObj.id}
-                type="text"
-                value={inputObj.value}
-                onChange={getChangeInput(index)}
-                onKeyDown={getKeyDown(index)}
-              />
-            );
+            if (index % 2 === 0) {
+              return (
+                <input
+                  key={inputObj.id}
+                  type="text"
+                  value={inputObj.value}
+                  onChange={getChangeInput(index)}
+                  onKeyDown={getKeyDown(index)}
+                />
+              );
+            } else {
+              return (
+                <EditableMathField
+                  key={inputObj.id}
+                  latex={inputObj.value}
+                  onChange={getChangeInput(index)}
+                />
+              );
+            }
           })}
         </InputGroup>
       </Row>
