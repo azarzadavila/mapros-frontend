@@ -2,34 +2,34 @@ import React, { useReducer, useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { addStyles, EditableMathField } from "react-mathquill";
 addStyles();
-let id = 0;
-const initialState = [{ id: 0, value: "" }];
+const initialState = { lastId: 0, items: [{ id: 0, value: "" }] };
 function reducer(state, action) {
-  let start, middle, end, newState, newValue;
+  let start, middle, end, newItems, newValue;
   switch (action.type) {
     case "update":
-      newState = state.slice();
-      newState[action.index].value = action.value;
-      return newState;
+      newItems = state.items.slice();
+      newItems[action.index].value = action.value;
+      return Object.assign({}, state, { items: newItems });
     case "add":
-      start = state.slice(0, action.index + 1);
+      start = state.items.slice(0, action.index + 1);
       middle = [
-        { id: id + 1, value: "" },
-        { id: id + 2, value: "" },
+        { id: state.lastId + 1, value: "" },
+        { id: state.lastId + 2, value: "" },
       ];
-      id += 2;
-      end = state.slice(action.index + 1, state.length);
-      return start.concat(middle, end);
+      end = state.items.slice(action.index + 1, state.length);
+      newItems = start.concat(middle, end);
+      return { lastId: state.lastId + 2, items: newItems };
     case "delete":
-      start = state.slice(0, action.index);
+      start = state.items.slice(0, action.index);
       newValue = start[action.index - 1].value;
       newValue += " ";
-      newValue += state[action.index + 1].value;
+      newValue += state.items[action.index + 1].value;
       start[action.index - 1] = Object.assign({}, start[action.index - 1], {
         value: newValue,
       });
-      end = state.slice(action.index + 2, state.length);
-      return start.concat(end);
+      end = state.items.slice(action.index + 2, state.length);
+      newItems = start.concat(end);
+      return Object.assign({}, state, { items: newItems });
     default:
       throw new Error();
   }
@@ -56,7 +56,7 @@ const MathQuillTest = () => {
       };
     } else {
       return (event) => {
-        if (event.keyCode === 8 && state[index].value === "") {
+        if (event.keyCode === 8 && state.items[index].value === "") {
           dispatch({ type: "delete", index: index });
         }
       };
@@ -66,7 +66,7 @@ const MathQuillTest = () => {
     <Container>
       <Row>
         <InputGroup>
-          {state.map((inputObj, index) => {
+          {state.items.map((inputObj, index) => {
             if (index % 2 === 0) {
               return (
                 <input
