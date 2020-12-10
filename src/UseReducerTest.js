@@ -1,14 +1,19 @@
 import React, { useReducer, useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 
-const initialState = { value: "" };
+const initialState = [{ value: "" }, { value: "" }];
 
 const reducer = (state, action) => {
+  let newState;
   switch (action.type) {
     case "update":
-      return { value: action.value };
+      newState = state.slice();
+      newState[action.index].value = action.value;
+      return newState;
     case "add":
-      return { value: state.value + "a" };
+      newState = state.slice();
+      newState[0].value += "a";
+      return newState;
     default:
       throw new Error();
   }
@@ -21,9 +26,15 @@ const UseReducerTest = () => {
       <Row>
         <Col>
           <input
-            value={state.value}
+            value={state[0].value}
             onChange={(event) => {
-              dispatch({ type: "update", value: event.target.value });
+              dispatch({ type: "update", value: event.target.value, index: 0 });
+            }}
+          />
+          <input
+            value={state[1].value}
+            onChange={(event) => {
+              dispatch({ type: "update", value: event.target.value, index: 1 });
             }}
           />
         </Col>
