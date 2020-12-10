@@ -72,6 +72,12 @@ function Menu() {
           alt="Symbols logo"
           link="/mathquill/"
         />
+        <MenuItem
+          name="Test UseReducer"
+          img={logo_symbols}
+          alt="Symbols logo"
+          link="/usereducer/"
+        />
       </Row>
     </Container>
   );
