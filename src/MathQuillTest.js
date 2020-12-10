@@ -5,7 +5,7 @@ addStyles();
 let id = 0;
 const initialState = [{ id: 0, value: "" }];
 function reducer(state, action) {
-  let start, middle, end, newState;
+  let start, middle, end, newState, newValue;
   switch (action.type) {
     case "update":
       newState = state.slice();
@@ -22,8 +22,12 @@ function reducer(state, action) {
       return start.concat(middle, end);
     case "delete":
       start = state.slice(0, action.index);
-      start[action.index - 1].value += " ";
-      start[action.index - 1].value += state[action.index + 1].value;
+      newValue = start[action.index - 1].value;
+      newValue += " ";
+      newValue += state[action.index + 1].value;
+      start[action.index - 1] = Object.assign({}, start[action.index - 1], {
+        value: newValue,
+      });
       end = state.slice(action.index + 2, state.length);
       return start.concat(end);
     default:
