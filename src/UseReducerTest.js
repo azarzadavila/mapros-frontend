@@ -4,7 +4,14 @@ import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 const initialState = { value: "" };
 
 const reducer = (state, action) => {
-  return { value: state.value + "a" };
+  switch (action.type) {
+    case "update":
+      return { value: action.value };
+    case "add":
+      return { value: state.value + "a" };
+    default:
+      throw new Error();
+  }
 };
 
 const UseReducerTest = () => {
@@ -13,14 +20,19 @@ const UseReducerTest = () => {
     <Container>
       <Row>
         <Col>
-          <p>{state.value}</p>
+          <input
+            value={state.value}
+            onChange={(event) => {
+              dispatch({ type: "update", value: event.target.value });
+            }}
+          />
         </Col>
       </Row>
       <Row>
         <Col>
           <Button
             onClick={(event) => {
-              dispatch({});
+              dispatch({ type: "add" });
             }}
           >
             +
