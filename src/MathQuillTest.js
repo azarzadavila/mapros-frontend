@@ -53,6 +53,16 @@ const MathQuillTest = () => {
         if (event.ctrlKey && event.keyCode === 13) {
           dispatch({ type: "add", index: index });
         }
+        if (
+          event.keyCode === 39 &&
+          event.target.selectionStart === state.items[index].value.length &&
+          state.items.length !== index + 1
+        ) {
+          console.log("Should change");
+        }
+        console.log(
+          `Index : ${index}. Position : ${event.target.selectionStart}`
+        );
       };
     } else {
       return (event) => {
