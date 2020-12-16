@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState, createRef } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { addStyles, EditableMathField } from "react-mathquill";
 addStyles();
@@ -36,6 +36,14 @@ function reducer(state, action) {
 }
 const MathQuillTest = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [elRefs, setElRefs] = useState([]);
+  useEffect(() => {
+    setElRefs(
+      Array(state.items.length)
+        .fill()
+        .map((_, index) => elRefs[index] || createRef())
+    );
+  }, [state]);
   const getChangeInput = (index) => {
     if (index % 2 === 0) {
       return (event) => {
@@ -59,6 +67,9 @@ const MathQuillTest = () => {
           state.items.length !== index + 1
         ) {
           console.log("Should change");
+          console.log(elRefs[index+1]);
+          console.log(elRefs[index+2]);
+          // elRefs[index+1].current.focus();
         }
         console.log(
           `Index : ${index}. Position : ${event.target.selectionStart}`
@@ -85,6 +96,7 @@ const MathQuillTest = () => {
                   value={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
+                  ref={elRefs[index]}
                 />
               );
             } else {
@@ -94,6 +106,7 @@ const MathQuillTest = () => {
                   latex={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
+                  ref={elRefs[index]}
                 />
               );
             }
