@@ -3,6 +3,8 @@ import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { addStyles, EditableMathField } from "react-mathquill";
 addStyles();
 const initialState = { lastId: 0, items: [{ id: 0, value: "" }] };
+const LEFT = -1;
+const RIGHT = 1;
 function reducer(state, action) {
   let start, middle, end, newItems, newValue;
   switch (action.type) {
@@ -101,6 +103,17 @@ const MathQuillTest = () => {
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
                   mathquillDidMount={(mathField) => (elRefs[index] = mathField)}
+                  config={{
+                    handlers: {
+                      moveOutOf: (dir, mathField) => {
+                        if (dir === LEFT) {
+                          console.log("LEFT OUT");
+                        } else if (dir === RIGHT) {
+                          console.log("RIGHT OUT");
+                        }
+                      },
+                    },
+                  }}
                 />
               );
             }
