@@ -66,14 +66,8 @@ const MathQuillTest = () => {
           event.target.selectionStart === state.items[index].value.length &&
           state.items.length !== index + 1
         ) {
-          console.log("Should change");
-          console.log(elRefs[index+1]);
-          console.log(elRefs[index+2]);
-          // elRefs[index+1].current.focus();
+          elRefs[index + 1].focus();
         }
-        console.log(
-          `Index : ${index}. Position : ${event.target.selectionStart}`
-        );
       };
     } else {
       return (event) => {
@@ -106,7 +100,7 @@ const MathQuillTest = () => {
                   latex={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
-                  ref={elRefs[index]}
+                  mathquillDidMount={(mathField) => (elRefs[index] = mathField)}
                 />
               );
             }
