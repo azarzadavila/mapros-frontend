@@ -36,15 +36,35 @@ function reducer(state, action) {
       throw new Error();
   }
 }
+function reducerRefs(state, action) {
+  switch (action.type) {
+    case "effect":
+      return {
+        array: Array(action.length)
+          .fill()
+          .map((_, index) => state.array[index] || createRef()),
+      };
+    case "update":
+      const newArray = state.array.slice();
+      newArray[action.index] = action.ref;
+      return { array: newArray };
+    case "focus":
+      if (action.index % 2 === 0) {
+        state.array[action.index].current.focus();
+      } else {
+        state.array[action.index].focus();
+      }
+      return state;
+    default:
+      throw new Error();
+  }
+}
+const initialRef = { array: [] };
 const MathQuillTest = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [elRefs, setElRefs] = useState([]);
+  const [elRefs, dispatchRef] = useReducer(reducerRefs, initialRef);
   useEffect(() => {
-    setElRefs(
-      Array(state.items.length)
-        .fill()
-        .map((_, index) => elRefs[index] || createRef())
-    );
+    dispatchRef({ type: "effect", length: state.items.length });
   }, [state]);
   const getChangeInput = (index) => {
     if (index % 2 === 0) {
@@ -68,7 +88,14 @@ const MathQuillTest = () => {
           event.target.selectionStart === state.items[index].value.length &&
           state.items.length !== index + 1
         ) {
-          elRefs[index + 1].focus();
+          dispatchRef({ type: "focus", index: index + 1 });
+        }
+        if (
+          event.keyCode === 37 &&
+          event.target.selectionStart === 0 &&
+          index !== 0
+        ) {
+          dispatchRef({ type: "focus", index: index - 1 });
         }
       };
     } else {
@@ -92,7 +119,7 @@ const MathQuillTest = () => {
                   value={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
-                  ref={elRefs[index]}
+                  ref={elRefs.array[index]}
                 />
               );
             } else {
@@ -102,14 +129,20 @@ const MathQuillTest = () => {
                   latex={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
-                  mathquillDidMount={(mathField) => (elRefs[index] = mathField)}
+                  mathquillDidMount={(mathField) =>
+                    dispatchRef({
+                      type: "update",
+                      index: index,
+                      ref: mathField,
+                    })
+                  }
                   config={{
                     handlers: {
                       moveOutOf: (dir, mathField) => {
                         if (dir === LEFT) {
-                          console.log("LEFT OUT");
+                          dispatchRef({ type: "focus", index: index - 1 });
                         } else if (dir === RIGHT) {
-                          console.log("RIGHT OUT");
+                          dispatchRef({ type: "focus", index: index + 1 });
                         }
                       },
                     },
