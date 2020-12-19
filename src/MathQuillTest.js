@@ -16,8 +16,14 @@ function reducer(state, action) {
       start = state.items.slice(0, action.index + 1);
       middle = [
         { id: state.lastId + 1, value: "" },
-        { id: state.lastId + 2, value: "" },
+        {
+          id: state.lastId + 2,
+          value: start[action.index].value.substring(action.selectionStart),
+        },
       ];
+      start[action.index] = Object.assign({}, start[action.index], {
+        value: start[action.index].value.substring(0, action.selectionStart),
+      });
       end = state.items.slice(action.index + 1, state.length);
       newItems = start.concat(middle, end);
       return { lastId: state.lastId + 2, items: newItems };
@@ -81,7 +87,11 @@ const MathQuillTest = () => {
     if (index % 2 === 0) {
       return (event) => {
         if (event.ctrlKey && event.keyCode === 13) {
-          dispatch({ type: "add", index: index });
+          dispatch({
+            type: "add",
+            index: index,
+            selectionStart: event.target.selectionStart,
+          });
         }
         if (
           event.keyCode === 39 &&
