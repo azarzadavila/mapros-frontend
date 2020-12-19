@@ -124,7 +124,7 @@ const MathQuillTest = () => {
             if (index % 2 === 0) {
               return (
                 <input
-                  key={inputObj.id}
+                  key={index}
                   type="text"
                   value={inputObj.value}
                   onChange={getChangeInput(index)}
@@ -135,7 +135,7 @@ const MathQuillTest = () => {
             } else {
               return (
                 <EditableMathField
-                  key={inputObj.id}
+                  key={index}
                   latex={inputObj.value}
                   onChange={getChangeInput(index)}
                   onKeyDown={getKeyDown(index)}
