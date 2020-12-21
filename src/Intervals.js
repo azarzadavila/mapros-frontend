@@ -1,22 +1,55 @@
 import React, { useEffect, useReducer, useState, createRef } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { addStyles, EditableMathField, StaticMathField } from "react-mathquill";
-import {v4 as uuid4} from "uuid";
+import { v4 as uuid4 } from "uuid";
 
 addStyles();
 
-function Premise(props) {
+function getIndex(list, id) {
+  let i = 0;
+  while (i < list.length) {
+    if (list[i].id === id) {
+      return i;
+    }
+    i++;
+  }
+  throw new Error();
+}
+
+const initialPremises = [{ id: "id" + uuid4(), value: "" }];
+
+const premisesReducer = (premises, action) => {
+  switch (action.type) {
+    case "update":
+      return premises.map((premise) => {
+        if (premise.id === action.id) {
+          return { ...premise, value: action.value };
+        }
+        return premise;
+      });
+    case "add":
+      const index = getIndex(premises, action.id);
+      const startPremises = premises.slice(0, index + 1);
+      const endPremises = premises.slice(index + 1, premises.length);
+      const newElem = { id: "id" + uuid4(), value: "" };
+      return startPremises.concat([newElem], endPremises);
+    default:
+      throw new Error();
+  }
+};
+
+function Premise({ latex, onChange, add }) {
   return (
     <Row>
       <Col xs={{ span: 9, offset: 2 }}>
         <EditableMathField
           className={"w-100"}
-          latex={props.latex}
-          onChange={props.onChange}
+          latex={latex}
+          onChange={(mathField) => onChange(mathField.latex())}
         />
       </Col>
       <Col xs={1}>
-        <Button>+</Button>
+        <Button onClick={() => add()}>+</Button>
       </Col>
     </Row>
   );
@@ -27,22 +60,26 @@ function Intervals() {
   const onChangeQuestion = (mathField) => {
     setQuestion(mathField.latex());
   };
-  const [premises, setPremises] = useState([""]);
-  const onPremiseChange = (index) => {
-    return (mathField) => {
-      const newPremises = premises.slice();
-      newPremises[index] = mathField.latex();
-      setPremises(newPremises);
-    };
+  const [premises, premisesDispatch] = useReducer(
+    premisesReducer,
+    initialPremises
+  );
+  const handlePremiseChange = (id) => {
+    return (value) =>
+      premisesDispatch({ type: "update", value: value, id: id });
+  };
+  const handleAdd = (id) => {
+    return () => premisesDispatch({ type: "add", id: id });
   };
   return (
     <Container>
-      {premises.map((premise, index) => {
+      {premises.map((premise) => {
         return (
           <Premise
-            key={index}
-            latex={premise}
-            onChange={onPremiseChange(index)}
+            key={premise.id}
+            latex={premise.value}
+            onChange={handlePremiseChange(premise.id)}
+            add={handleAdd(premise.id)}
           />
         );
       })}
@@ -51,7 +88,11 @@ function Intervals() {
           <label className={"w-100"}>Ask :</label>
         </Col>
         <Col xs={10}>
-          <EditableMathField latex={question} onChange={onChangeQuestion} />
+          <EditableMathField
+            className={"w-100"}
+            latex={question}
+            onChange={onChangeQuestion}
+          />
         </Col>
       </Row>
       <Row>
@@ -59,7 +100,9 @@ function Intervals() {
           <Button className={"w-100"}>Compute</Button>
         </Col>
         <Col xs={10}>
-          <StaticMathField>{"\\frac{a}{\\beta}"}</StaticMathField>
+          <StaticMathField className={"w-100"}>
+            {"\\frac{a}{\\beta}"}
+          </StaticMathField>
         </Col>
       </Row>
     </Container>
