@@ -8,7 +8,11 @@ function Premise(props) {
   return (
     <Row>
       <Col xs={{ span: 9, offset: 2 }}>
-        <EditableMathField className={"w-100"} />
+        <EditableMathField
+          className={"w-100"}
+          latex={props.latex}
+          onChange={props.onChange}
+        />
       </Col>
       <Col xs={1}>
         <Button>+</Button>
@@ -22,9 +26,13 @@ function Intervals() {
   const onChangeQuestion = (mathField) => {
     setQuestion(mathField.latex());
   };
+  const [premise, setPremise] = useState("");
+  const onPremiseChange = (mathField) => {
+    setPremise(mathField.latex());
+  };
   return (
     <Container>
-      <Premise />
+      <Premise latex={premise} onChange={onPremiseChange} />
       <Row>
         <Col xs={2}>
           <label className={"w-100"}>Ask :</label>
