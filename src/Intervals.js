@@ -4,6 +4,19 @@ import { addStyles, EditableMathField, StaticMathField } from "react-mathquill";
 
 addStyles();
 
+function Premise(props) {
+  return (
+    <Row>
+      <Col xs={{ span: 9, offset: 2 }}>
+        <EditableMathField className={"w-100"} />
+      </Col>
+      <Col xs={1}>
+        <Button>+</Button>
+      </Col>
+    </Row>
+  );
+}
+
 function Intervals() {
   const [question, setQuestion] = useState("");
   const onChangeQuestion = (mathField) => {
@@ -11,6 +24,7 @@ function Intervals() {
   };
   return (
     <Container>
+      <Premise />
       <Row>
         <Col xs={2}>
           <label className={"w-100"}>Ask :</label>
