@@ -26,13 +26,25 @@ function Intervals() {
   const onChangeQuestion = (mathField) => {
     setQuestion(mathField.latex());
   };
-  const [premise, setPremise] = useState("");
-  const onPremiseChange = (mathField) => {
-    setPremise(mathField.latex());
+  const [premises, setPremises] = useState([""]);
+  const onPremiseChange = (index) => {
+    return (mathField) => {
+      const newPremises = premises.slice();
+      newPremises[index] = mathField.latex();
+      setPremises(newPremises);
+    };
   };
   return (
     <Container>
-      <Premise latex={premise} onChange={onPremiseChange} />
+      {premises.map((premise, index) => {
+        return (
+          <Premise
+            key={index}
+            latex={premise}
+            onChange={onPremiseChange(index)}
+          />
+        );
+      })}
       <Row>
         <Col xs={2}>
           <label className={"w-100"}>Ask :</label>
