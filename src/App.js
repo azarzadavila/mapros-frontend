@@ -12,6 +12,7 @@ import StandAloneProof from "./StandAloneProof";
 import { FormalCommuncation } from "./FormalCommunication";
 import MathQuillTest from "./MathQuillTest";
 import UseReducerTest from "./UseReducerTest";
+import Intervals from "./Intervals";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -68,7 +69,8 @@ class App extends React.Component {
         <Route path="/standalone_proof/" component={StandAloneProof} />
         <Route path="/api-test/" component={FormalCommuncation} />
         <Route path="/mathquill/" component={MathQuillTest} />
-        <Route path="/usereducer/" component={UseReducerTest}/>
+        <Route path="/usereducer/" component={UseReducerTest} />
+        <Route path="/intervals/" component={Intervals} />
       </Router>
     );
   }
