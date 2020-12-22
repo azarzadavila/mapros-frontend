@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState, createRef } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
 import { addStyles, EditableMathField, StaticMathField } from "react-mathquill";
 import { v4 as uuid4 } from "uuid";
+import { askQuestion } from "./IntervalsCommunication";
 
 addStyles();
 
@@ -71,6 +72,17 @@ function Intervals() {
   const handleAdd = (id) => {
     return () => premisesDispatch({ type: "add", id: id });
   };
+  const [answer, setAnswer] = useState("");
+  const handleAsk = () => {
+    const premisesSent = premises.map((premise) => premise.value);
+    askQuestion(premisesSent, question)
+      .then((response) => {
+        setAnswer(response.data.answer);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
   return (
     <Container>
       {premises.map((premise) => {
@@ -97,12 +109,12 @@ function Intervals() {
       </Row>
       <Row>
         <Col xs={2}>
-          <Button className={"w-100"}>Compute</Button>
+          <Button className={"w-100"} onClick={handleAsk}>
+            Compute
+          </Button>
         </Col>
         <Col xs={10}>
-          <StaticMathField className={"w-100"}>
-            {"\\frac{a}{\\beta}"}
-          </StaticMathField>
+          <StaticMathField className={"w-100"}>{answer}</StaticMathField>
         </Col>
       </Row>
     </Container>
