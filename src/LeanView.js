@@ -25,8 +25,7 @@ function LineEditor({ line, onChange, numLabel, onClick }) {
   );
 }
 
-function LeanEditor({ changeMsg }) {
-  const [lines, setLines] = useState([]);
+function LeanEditor({ changeMsg, lines, setLines }) {
   const handleLine = (index, value) => {
     const newLines = lines.slice();
     newLines[index] = value;
@@ -77,6 +76,7 @@ function LeanPanel({ msg }) {
 
 function LeanView() {
   const [msg, setMsg] = useState("");
+  const [lines, setLines] = useState([]);
   const changeMsg = (value) => {
     setMsg(value);
   };
@@ -107,14 +107,14 @@ function LeanView() {
               <Button
                 variant="primary"
                 onClick={() =>
-                  sync().catch((error) => changeMsg(error.message))
+                  sync(new LeanFile(lines)).catch((error) => changeMsg(error.message))
                 }
               >
                 SYNC
               </Button>
             </Col>
           </Row>
-          <LeanEditor changeMsg={changeMsg} />
+          <LeanEditor changeMsg={changeMsg} lines={lines} setLines={setLines}/>
         </Col>
         <Col xs={4}>
           <LeanPanel msg={msg} />
