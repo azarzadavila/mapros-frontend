@@ -78,6 +78,12 @@ function Menu() {
           alt="Symbols logo"
           link="/usereducer/"
         />
+        <MenuItem
+          name="LeanView"
+          img={logo_symbols}
+          alt="Symbols logo"
+          link="/leanview/"
+        />
       </Row>
     </Container>
   );
