@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row } from "react-bootstrap";
+import { end, LeanFile, start, stateAt, sync } from "./LeanCommunication";
 
-function LineEditor({ line, onChange, numLabel }) {
+function LineEditor({ line, onChange, numLabel, onClick }) {
   const handleChange = (event) => {
     onChange(event.target.value);
   };
@@ -16,13 +17,15 @@ function LineEditor({ line, onChange, numLabel }) {
         </InputGroup>
       </Col>
       <Col xs={2}>
-        <Button variant="primary">S</Button>
+        <Button variant="primary" onClick={(event) => onClick()}>
+          S
+        </Button>
       </Col>
     </Row>
   );
 }
 
-function LeanEditor() {
+function LeanEditor({ changeMsg }) {
   const [lines, setLines] = useState([]);
   const handleLine = (index, value) => {
     const newLines = lines.slice();
@@ -31,6 +34,16 @@ function LeanEditor() {
   };
   const addLine = (event) => {
     setLines(lines.concat(""));
+  };
+  const handleClick = (index) => {
+    console.log("After index " + index);
+    stateAt(new LeanFile(lines), index + 1)
+      .then((response) => {
+        changeMsg(response.data.msg);
+      })
+      .catch((error) => {
+        changeMsg(error.message);
+      });
   };
   return (
     <>
@@ -44,6 +57,7 @@ function LeanEditor() {
               }}
               numLabel={(index + 1).toString()}
               key={index}
+              onClick={() => handleClick(index)}
             />
           );
         })}
@@ -57,19 +71,53 @@ function LeanEditor() {
   );
 }
 
-function LeanPanel({msg}) {
-  return <p>{msg}</p>
+function LeanPanel({ msg }) {
+  return <p>{msg}</p>;
 }
 
 function LeanView() {
+  const [msg, setMsg] = useState("");
+  const changeMsg = (value) => {
+    setMsg(value);
+  };
   return (
     <Container>
       <Row>
         <Col xs={8}>
-          <LeanEditor />
+          <Row>
+            <Col xs={4}>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  start().catch((error) => changeMsg(error.message))
+                }
+              >
+                START
+              </Button>
+            </Col>
+            <Col xs={4}>
+              <Button
+                variant="primary"
+                onClick={() => end().catch((error) => changeMsg(error.message))}
+              >
+                END
+              </Button>
+            </Col>
+            <Col xs={4}>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  sync().catch((error) => changeMsg(error.message))
+                }
+              >
+                SYNC
+              </Button>
+            </Col>
+          </Row>
+          <LeanEditor changeMsg={changeMsg} />
         </Col>
         <Col xs={4}>
-          <LeanPanel msg={"Hello World"}/>
+          <LeanPanel msg={msg} />
         </Col>
       </Row>
     </Container>
