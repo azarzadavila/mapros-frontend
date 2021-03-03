@@ -36,9 +36,11 @@ function LeanEditor({ changeMsg, lines, setLines }) {
   };
   const handleClick = (index) => {
     console.log("After index " + index);
-    stateAt(new LeanFile(lines), index + 1)
+    console.log("line " + index);
+    console.log("col " + lines[index].length);
+    stateAt(new LeanFile(lines), index + 1, lines[index].length)
       .then((response) => {
-        changeMsg(response.data.msg);
+        changeMsg(JSON.stringify(response.data.messages));
       })
       .catch((error) => {
         changeMsg(error.message);
@@ -107,14 +109,18 @@ function LeanView() {
               <Button
                 variant="primary"
                 onClick={() =>
-                  sync(new LeanFile(lines)).catch((error) => changeMsg(error.message))
+                  sync(new LeanFile(lines))
+                    .then((response) =>
+                      changeMsg(JSON.stringify(response.data.messages))
+                    )
+                    .catch((error) => changeMsg(error.message))
                 }
               >
                 SYNC
               </Button>
             </Col>
           </Row>
-          <LeanEditor changeMsg={changeMsg} lines={lines} setLines={setLines}/>
+          <LeanEditor changeMsg={changeMsg} lines={lines} setLines={setLines} />
         </Col>
         <Col xs={4}>
           <LeanPanel msg={msg} />
