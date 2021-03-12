@@ -52,6 +52,10 @@ let lastProof = 0;
 function MainView() {
   const [hypotheses, setHypotheses] = useState([]);
   const [proofs, setProofs] = useState([]);
+  const [name, setName] = useState("");
+  const onChangeName = (event) => {
+    setName(event.target.value);
+  };
   const addHypothesis = (event) => {
     const newHypotheses = hypotheses.slice();
     newHypotheses.push({ ident: "", text: "", id: lastHyp });
@@ -98,7 +102,9 @@ function MainView() {
         <Col xs={8}>
           <InputGroup>
             <InputGroup.Prepend>
-              <InputGroup.Text>Theorem Name :</InputGroup.Text>
+              <InputGroup.Text value={name} onChange={onChangeName}>
+                Theorem Name :
+              </InputGroup.Text>
             </InputGroup.Prepend>
             <Form.Control placeholder="name" aria-label="name" />
           </InputGroup>
