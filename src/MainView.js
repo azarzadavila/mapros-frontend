@@ -114,7 +114,7 @@ function MainView() {
   };
   const clearAfter = (index, proofs) => {
     for (let i = index; i < proofs.length; i++) {
-      proofs[index].state = "";
+      proofs[i].state = "";
     }
   };
   const changeWithResponse = (data) => {
@@ -134,6 +134,13 @@ function MainView() {
     setProofs(newProofs);
   };
 
+  const updateState = (index, state) => {
+    const newProofs = proofs.slice();
+    newProofs[index] = { ...newProofs[index] };
+    newProofs[index].state = state;
+    setProofs(newProofs);
+  };
+
   const genToSend = (index) => {
     return {
       name: name,
@@ -147,7 +154,13 @@ function MainView() {
     const toSend = genToSend(-1);
     askState(toSend)
       .then((response) => changeWithResponse(response.data))
-      .catch((error) => setInitialMessage("ERROR"));
+      .catch((error) => {
+        if (error.response && error.response.data.detail) {
+          setInitialMessage(error.response.data.detail);
+        } else {
+          setInitialMessage("ERROR");
+        }
+      });
   };
 
   const handleAskState = (index) => {
@@ -155,7 +168,13 @@ function MainView() {
       const toSend = genToSend(index);
       askState(toSend)
         .then((response) => changeWithResponse(response.data))
-        .catch((error) => setInitialMessage("ERROR"));
+        .catch((error) => {
+          if (error.response && error.response.data.detail) {
+            updateState(index, error.response.data.detail);
+          } else {
+            updateState(index, "ERROR");
+          }
+        });
     };
   };
   return (
