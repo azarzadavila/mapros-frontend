@@ -8,6 +8,7 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
+import { askState } from "./MainCommunication";
 
 function HypothesisLine({ ident, text, onChange, onDelete }) {
   return (
@@ -27,7 +28,7 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
   );
 }
 
-function ProofLine({ text, onChange, onDelete }) {
+function ProofLine({ text, onChange, onDelete, state, onAskState }) {
   return (
     <Row className="mb-3">
       <Col xs={8}>
@@ -35,12 +36,12 @@ function ProofLine({ text, onChange, onDelete }) {
           <Form.Control value={text} onChange={onChange} />
           <InputGroup.Append>
             <Button onClick={onDelete}>-</Button>
-            <Button>S</Button>
+            <Button onClick={onAskState}>S</Button>
           </InputGroup.Append>
         </InputGroup>
       </Col>
       <Col xs={4}>
-        <Alert variant="dark">b_n \rightarrow l</Alert>
+        <Alert variant="dark">{state}</Alert>
       </Col>
     </Row>
   );
@@ -53,8 +54,13 @@ function MainView() {
   const [hypotheses, setHypotheses] = useState([]);
   const [proofs, setProofs] = useState([]);
   const [name, setName] = useState("");
+  const [goal, setGoal] = useState("");
+  const [initialMessage, setInitialMessage] = useState("");
   const onChangeName = (event) => {
     setName(event.target.value);
+  };
+  const onChangeGoal = (event) => {
+    setGoal(event.target.value);
   };
   const addHypothesis = (event) => {
     const newHypotheses = hypotheses.slice();
@@ -83,7 +89,7 @@ function MainView() {
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
   const addProof = (event) => {
     const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof });
+    newProofs.push({ text: "", id: lastProof, state: "" });
     setProofs(newProofs);
     lastProof += 1;
   };
@@ -96,17 +102,82 @@ function MainView() {
     };
   };
   const handleProofDelete = deleteFromList(proofs, setProofs);
+  const hypothesesContent = () => {
+    return hypotheses.map((hypothesis) => hypothesis.text);
+  };
+  const proofsContent = () => {
+    return proofs.map((proof) => proof.text);
+  };
+  const changeWithResponse = (data) => {
+    const newHypotheses = hypotheses.slice();
+    data.hypothesesIdent.map((ident, index) => {
+      newHypotheses[index] = { ...newHypotheses[index] };
+      newHypotheses[index].ident = ident;
+    });
+    setHypotheses(newHypotheses);
+    setInitialMessage(data.initialState);
+    const newProofs = proofs.slice();
+    data.states.map((state, index) => {
+      newProofs[index] = { ...newProofs[index] };
+      newProofs[index].state = state;
+    });
+    setProofs(newProofs);
+  };
+
+  const genToSend = () => {
+    return {
+      name: name,
+      hypotheses: hypothesesContent(),
+      goal: goal,
+      proofs: proofsContent(),
+      clickOn: null,
+    };
+  };
+
+  const askStateInitial = (event) => {
+    const toSend = genToSend();
+    toSend.clickOn = -1;
+    askState(toSend)
+      .then((response) => changeWithResponse(response.data))
+      .catch((error) => setInitialMessage("ERROR"));
+  };
+  const changeState = (index) => {
+    const toSend = genToSend();
+    toSend.clickOn = index;
+    askState(toSend)
+      .then((response) => changeWithResponse(response.data))
+      .catch((error) => setInitialMessage("ERROR"));
+  };
+  const handleAskState = (index) => {
+    return (event) => {
+      const toSend = {
+        name: name,
+        hypotheses: hypothesesContent(),
+        goal: goal,
+        proofs: proofsContent(),
+        clickOn: index,
+      };
+      askState(toSend)
+        .then((response) => {})
+        .catch((error) => {
+          setInitialMessage("ERROR");
+        });
+    };
+  };
   return (
     <Container>
       <Row className="mb-3">
         <Col xs={8}>
           <InputGroup>
             <InputGroup.Prepend>
-              <InputGroup.Text value={name} onChange={onChangeName}>
-                Theorem Name :
-              </InputGroup.Text>
+              <InputGroup.Text>Theorem Name :</InputGroup.Text>
             </InputGroup.Prepend>
-            <Form.Control placeholder="name" aria-label="name" />
+            <Form.Control
+              placeholder="name"
+              aria-label="name"
+              value={name}
+              onChange={onChangeName}
+            />
           </InputGroup>
         </Col>
       </Row>
@@ -136,7 +207,12 @@ function MainView() {
       </Row>
       <Row className="mb-3">
         <Col xs={8}>
-          <Form.Control placeholder="goal" aria-label="goal" />
+          <Form.Control
+            placeholder="goal"
+            aria-label="goal"
+            value={goal}
+            onChange={onChangeGoal}
+          />
         </Col>
       </Row>
       <Row>
@@ -145,7 +221,12 @@ function MainView() {
           <Button className="ml-3 mb-3" onClick={addProof}>
             +
           </Button>
-          <Button className="ml-3 mb-3">S</Button>
+          <Button className="ml-3 mb-3" onClick={askStateInitial}>
+            S
+          </Button>
+        </Col>
+        <Col xs={4}>
+          <Alert variant="dark">{initialMessage}</Alert>
         </Col>
       </Row>
       {proofs.map((proof, index) => {
@@ -155,6 +236,7 @@ function MainView() {
             key={proof.id}
             onChange={handleProofChange(index)}
             onDelete={handleProofDelete(index)}
+            onAskState={handleAskState(index)}
           />
         );
       })}
