@@ -105,38 +105,46 @@ function MainView() {
   const hypothesesContent = () => {
     return hypotheses.map((hypothesis) => hypothesis.text);
   };
-  const proofsContent = () => {
-    return proofs.map((proof) => proof.text);
+  const proofsContent = (index) => {
+    const res = [];
+    for (let i = 0; i <= index; i++) {
+      res.push(proofs[i].text);
+    }
+    return res;
+  };
+  const clearAfter = (index, proofs) => {
+    for (let i = index; i < proofs.length; i++) {
+      proofs[index].state = "";
+    }
   };
   const changeWithResponse = (data) => {
     const newHypotheses = hypotheses.slice();
-    data.hypothesesIdent.map((ident, index) => {
+    data.hypothesesIdent.forEach((ident, index) => {
       newHypotheses[index] = { ...newHypotheses[index] };
       newHypotheses[index].ident = ident;
     });
     setHypotheses(newHypotheses);
     setInitialMessage(data.initialState);
     const newProofs = proofs.slice();
-    data.states.map((state, index) => {
+    data.states.forEach((state, index) => {
       newProofs[index] = { ...newProofs[index] };
       newProofs[index].state = state;
     });
+    clearAfter(data.states.length, newProofs);
     setProofs(newProofs);
   };
 
-  const genToSend = () => {
+  const genToSend = (index) => {
     return {
       name: name,
       hypotheses: hypothesesContent(),
       goal: goal,
-      proofs: proofsContent(),
-      clickOn: null,
+      proofs: proofsContent(index),
     };
   };
 
   const askStateInitial = (event) => {
-    const toSend = genToSend();
-    toSend.clickOn = -1;
+    const toSend = genToSend(-1);
     askState(toSend)
       .then((response) => changeWithResponse(response.data))
       .catch((error) => setInitialMessage("ERROR"));
@@ -144,8 +152,7 @@ function MainView() {
 
   const handleAskState = (index) => {
     return (event) => {
-      const toSend = genToSend();
-      toSend.clickOn = index;
+      const toSend = genToSend(index);
       askState(toSend)
         .then((response) => changeWithResponse(response.data))
         .catch((error) => setInitialMessage("ERROR"));
