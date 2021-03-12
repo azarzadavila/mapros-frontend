@@ -141,27 +141,14 @@ function MainView() {
       .then((response) => changeWithResponse(response.data))
       .catch((error) => setInitialMessage("ERROR"));
   };
-  const changeState = (index) => {
-    const toSend = genToSend();
-    toSend.clickOn = index;
-    askState(toSend)
-      .then((response) => changeWithResponse(response.data))
-      .catch((error) => setInitialMessage("ERROR"));
-  };
+
   const handleAskState = (index) => {
     return (event) => {
-      const toSend = {
-        name: name,
-        hypotheses: hypothesesContent(),
-        goal: goal,
-        proofs: proofsContent(),
-        clickOn: index,
-      };
+      const toSend = genToSend();
+      toSend.clickOn = index;
       askState(toSend)
-        .then((response) => {})
-        .catch((error) => {
-          setInitialMessage("ERROR");
-        });
+        .then((response) => changeWithResponse(response.data))
+        .catch((error) => setInitialMessage("ERROR"));
     };
   };
   return (
@@ -233,6 +220,7 @@ function MainView() {
         return (
           <ProofLine
             text={proof.text}
+            state={proof.state}
             key={proof.id}
             onChange={handleProofChange(index)}
             onDelete={handleProofDelete(index)}
