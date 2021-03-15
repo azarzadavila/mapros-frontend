@@ -52,10 +52,12 @@ function ProofLine({
           <Alert variant="dark">{state}</Alert>
         </Col>
       </Row>
-      {additional.map((value, index) => (
+      {additional.map((addi, index) => (
         <Row className="mb-3" key={index}>
           <Col xs={8}>
-            <Alert variant="dark">{value}</Alert>
+            <Alert variant="dark">
+              ({addi.ident}) : {addi.value}
+            </Alert>
           </Col>
         </Row>
       ))}
