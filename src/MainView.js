@@ -28,22 +28,38 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
   );
 }
 
-function ProofLine({ text, onChange, onDelete, state, onAskState }) {
+function ProofLine({
+  text,
+  onChange,
+  onDelete,
+  state,
+  onAskState,
+  additional,
+}) {
   return (
-    <Row className="mb-3">
-      <Col xs={8}>
-        <InputGroup>
-          <Form.Control value={text} onChange={onChange} />
-          <InputGroup.Append>
-            <Button onClick={onDelete}>-</Button>
-            <Button onClick={onAskState}>S</Button>
-          </InputGroup.Append>
-        </InputGroup>
-      </Col>
-      <Col xs={4}>
-        <Alert variant="dark">{state}</Alert>
-      </Col>
-    </Row>
+    <>
+      <Row className="mb-3">
+        <Col xs={8}>
+          <InputGroup>
+            <Form.Control value={text} onChange={onChange} />
+            <InputGroup.Append>
+              <Button onClick={onDelete}>-</Button>
+              <Button onClick={onAskState}>S</Button>
+            </InputGroup.Append>
+          </InputGroup>
+        </Col>
+        <Col xs={4}>
+          <Alert variant="dark">{state}</Alert>
+        </Col>
+      </Row>
+      {additional.map((value, index) => (
+        <Row className="mb-3" key={index}>
+          <Col xs={8}>
+            <Alert variant="dark">{value}</Alert>
+          </Col>
+        </Row>
+      ))}
+    </>
   );
 }
 
@@ -89,7 +105,7 @@ function MainView() {
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
   const addProof = (event) => {
     const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof, state: "" });
+    newProofs.push({ text: "", id: lastProof, state: "", additional: [] });
     setProofs(newProofs);
     lastProof += 1;
   };
@@ -129,6 +145,9 @@ function MainView() {
     data.states.forEach((state, index) => {
       newProofs[index] = { ...newProofs[index] };
       newProofs[index].state = state;
+    });
+    data.additional.forEach((additional, index) => {
+      newProofs[index].additional = additional;
     });
     clearAfter(data.states.length, newProofs);
     setProofs(newProofs);
@@ -251,6 +270,7 @@ function MainView() {
             onChange={handleProofChange(index)}
             onDelete={handleProofDelete(index)}
             onAskState={handleAskState(index)}
+            additional={proof.additional}
           />
         );
       })}
