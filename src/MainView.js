@@ -32,10 +32,23 @@ function ProofLine({
   text,
   onChange,
   onDelete,
-  state,
+  goal,
   onAskState,
-  additional,
+  sentences,
+  leanMsg,
 }) {
+  let leanAlert;
+  if (leanMsg) {
+    leanAlert = (
+      <Row className="mb-3">
+        <Alert variant="primary" className="w-100">
+          {leanMsg}
+        </Alert>
+      </Row>
+    );
+  } else {
+    leanAlert = <></>;
+  }
   return (
     <>
       <Row className="mb-3">
@@ -49,18 +62,19 @@ function ProofLine({
           </InputGroup>
         </Col>
         <Col xs={4}>
-          <Alert variant="dark">{state}</Alert>
+          <Alert variant="dark">{goal}</Alert>
         </Col>
       </Row>
-      {additional.map((addi, index) => (
+      {sentences.map((sentence, index) => (
         <Row className="mb-3" key={index}>
           <Col xs={8}>
             <Alert variant="dark">
-              ({addi.ident}) : {addi.value}
+              ({sentence.ident}) : {sentence.sentence}
             </Alert>
           </Col>
         </Row>
       ))}
+      {leanAlert}
     </>
   );
 }
@@ -74,6 +88,8 @@ function MainView() {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
+  const [leanError, setLeanError] = useState("NO MESSAGE");
+  const [leanIndex, setLeanIndex] = useState(-1);
   const onChangeName = (event) => {
     setName(event.target.value);
   };
@@ -107,7 +123,7 @@ function MainView() {
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
   const addProof = (event) => {
     const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof, state: "", additional: [] });
+    newProofs.push({ text: "", id: lastProof, goal: "", sentences: [] });
     setProofs(newProofs);
     lastProof += 1;
   };
@@ -132,33 +148,40 @@ function MainView() {
   };
   const clearAfter = (index, proofs) => {
     for (let i = index; i < proofs.length; i++) {
-      proofs[i].state = "";
+      proofs[i].goal = "";
+      proofs[i].sentences = [];
     }
   };
   const changeWithResponse = (data) => {
     const newHypotheses = hypotheses.slice();
-    data.hypothesesIdent.forEach((ident, index) => {
+    data.hypotheses_ident.forEach((ident, index) => {
       newHypotheses[index] = { ...newHypotheses[index] };
       newHypotheses[index].ident = ident;
     });
     setHypotheses(newHypotheses);
-    setInitialMessage(data.initialState);
+    setInitialMessage(data.initial_goal);
     const newProofs = proofs.slice();
-    data.states.forEach((state, index) => {
+    data.goals.forEach((state, index) => {
       newProofs[index] = { ...newProofs[index] };
-      newProofs[index].state = state;
+      newProofs[index].goal = state;
     });
-    data.additional.forEach((additional, index) => {
-      newProofs[index].additional = additional;
+    data.sentences.forEach((cur_sentences, index) => {
+      newProofs[index].sentences = cur_sentences;
     });
-    clearAfter(data.states.length, newProofs);
+    clearAfter(data.goals.length, newProofs);
+    setLeanIndex(data.goals.length - 1);
+    if (data.error) {
+      setLeanError(data.error);
+    } else {
+      setLeanError("NO MESSAGE");
+    }
     setProofs(newProofs);
   };
 
   const updateState = (index, state) => {
     const newProofs = proofs.slice();
     newProofs[index] = { ...newProofs[index] };
-    newProofs[index].state = state;
+    newProofs[index].goal = state;
     setProofs(newProofs);
   };
 
@@ -177,9 +200,12 @@ function MainView() {
       .then((response) => changeWithResponse(response.data))
       .catch((error) => {
         if (error.response && error.response.data.detail) {
-          setInitialMessage(error.response.data.detail);
+          setLeanIndex(-1);
+          setLeanError(error.response.data.detail);
         } else {
-          setInitialMessage("ERROR");
+          console.log(error);
+          setLeanIndex(-1);
+          setLeanError("ERROR");
         }
       });
   };
@@ -191,13 +217,26 @@ function MainView() {
         .then((response) => changeWithResponse(response.data))
         .catch((error) => {
           if (error.response && error.response.data.detail) {
-            updateState(index, error.response.data.detail);
+            setLeanIndex(index);
+            setLeanError(error.response.data.detail);
           } else {
-            updateState(index, "ERROR");
+            console.log(error);
+            setLeanIndex(index);
+            setLeanError("ERROR");
           }
         });
     };
   };
+  let leanInitMsg;
+  if (leanIndex === -1) {
+    leanInitMsg = (
+      <Alert className="w-100" variant="primary">
+        {leanError}
+      </Alert>
+    );
+  } else {
+    leanInitMsg = <></>;
+  }
   return (
     <Container>
       <Row className="mb-3">
@@ -263,16 +302,22 @@ function MainView() {
           <Alert variant="dark">{initialMessage}</Alert>
         </Col>
       </Row>
+      {leanInitMsg}
       {proofs.map((proof, index) => {
+        let leanMsg = null;
+        if (index === leanIndex) {
+          leanMsg = leanError;
+        }
         return (
           <ProofLine
             text={proof.text}
-            state={proof.state}
+            goal={proof.goal}
             key={proof.id}
             onChange={handleProofChange(index)}
             onDelete={handleProofDelete(index)}
             onAskState={handleAskState(index)}
-            additional={proof.additional}
+            sentences={proof.sentences}
+            leanMsg={leanMsg}
           />
         );
       })}
