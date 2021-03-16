@@ -15,6 +15,7 @@ import UseReducerTest from "./UseReducerTest";
 import Intervals from "./Intervals";
 import LeanView from "./LeanView";
 import MainView from "./MainView";
+import TestMainView from "./TestMainView";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -75,6 +76,7 @@ class App extends React.Component {
         <Route path="/intervals/" component={Intervals} />
         <Route path="/leanview/" component={LeanView} />
         <Route path="/main/" component={MainView} />
+        <Route path="/maintest/" component={TestMainView}/>
       </Router>
     );
   }
