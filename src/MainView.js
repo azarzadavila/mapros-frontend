@@ -9,6 +9,7 @@ import {
   Row,
 } from "react-bootstrap";
 import { askState } from "./MainCommunication";
+import MathQuillElement from "./MathQuillElement";
 
 function HypothesisLine({ ident, text, onChange, onDelete }) {
   return (
@@ -18,7 +19,7 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
           <InputGroup.Prepend>
             <InputGroup.Text>{ident}</InputGroup.Text>
           </InputGroup.Prepend>
-          <Form.Control value={text} onChange={onChange} />
+          <MathQuillElement setValue={onChange} />
           <InputGroup.Append>
             <Button onClick={onDelete}>-</Button>
           </InputGroup.Append>
@@ -29,7 +30,6 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
 }
 
 function ProofLine({
-  text,
   onChange,
   onDelete,
   goal,
@@ -54,7 +54,7 @@ function ProofLine({
       <Row className="mb-3">
         <Col xs={8}>
           <InputGroup>
-            <Form.Control value={text} onChange={onChange} />
+            <MathQuillElement setValue={onChange} />
             <InputGroup.Append>
               <Button onClick={onDelete}>-</Button>
               <Button onClick={onAskState}>S</Button>
@@ -93,8 +93,8 @@ function MainView() {
   const onChangeName = (event) => {
     setName(event.target.value);
   };
-  const onChangeGoal = (event) => {
-    setGoal(event.target.value);
+  const onChangeGoal = (value) => {
+    setGoal(value);
   };
   const addHypothesis = (event) => {
     const newHypotheses = hypotheses.slice();
@@ -103,10 +103,10 @@ function MainView() {
     lastHyp += 1;
   };
   const handleHypothesisChange = (index) => {
-    return (event) => {
+    return (value) => {
       const newHypotheses = hypotheses.slice();
       newHypotheses[index] = { ...newHypotheses[index] };
-      newHypotheses[index].text = event.target.value;
+      newHypotheses[index].text = value;
       setHypotheses(newHypotheses);
     };
   };
@@ -128,10 +128,10 @@ function MainView() {
     lastProof += 1;
   };
   const handleProofChange = (index) => {
-    return (event) => {
+    return (value) => {
       const newProofs = proofs.slice();
       newProofs[index] = { ...newProofs[index] };
-      newProofs[index].text = event.target.value;
+      newProofs[index].text = value;
       setProofs(newProofs);
     };
   };
@@ -175,13 +175,6 @@ function MainView() {
     } else {
       setLeanError("NO MESSAGE");
     }
-    setProofs(newProofs);
-  };
-
-  const updateState = (index, state) => {
-    const newProofs = proofs.slice();
-    newProofs[index] = { ...newProofs[index] };
-    newProofs[index].goal = state;
     setProofs(newProofs);
   };
 
@@ -280,12 +273,7 @@ function MainView() {
       </Row>
       <Row className="mb-3">
         <Col xs={8}>
-          <Form.Control
-            placeholder="goal"
-            aria-label="goal"
-            value={goal}
-            onChange={onChangeGoal}
-          />
+          <MathQuillElement setValue={onChangeGoal} />
         </Col>
       </Row>
       <Row>
