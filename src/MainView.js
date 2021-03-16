@@ -279,6 +279,11 @@ function MainView() {
             />
           </InputGroup>
         </Col>
+        <Col xs={4}>
+          <h2>
+            GOAL STATE
+          </h2>
+        </Col>
       </Row>
       <Row className="mb-3">
         <Col xs={4}>
