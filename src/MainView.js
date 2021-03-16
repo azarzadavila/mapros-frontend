@@ -7,6 +7,7 @@ import {
   Form,
   InputGroup,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import { askState } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
@@ -123,6 +124,7 @@ function MainView() {
   const [initialMessage, setInitialMessage] = useState("");
   const [leanError, setLeanError] = useState("NO MESSAGE");
   const [leanIndex, setLeanIndex] = useState(-1);
+  const [waitVisibility, setWaitVisibility] = useState("invisible");
   const onChangeName = (event) => {
     setName(event.target.value);
   };
@@ -222,8 +224,12 @@ function MainView() {
 
   const askStateInitial = (event) => {
     const toSend = genToSend(-1);
+    setWaitVisibility("visible");
     askState(toSend)
-      .then((response) => changeWithResponse(response.data))
+      .then((response) => {
+        setWaitVisibility("invisible");
+        changeWithResponse(response.data);
+      })
       .catch((error) => {
         if (error.response && error.response.data.detail) {
           setLeanIndex(-1);
@@ -233,14 +239,19 @@ function MainView() {
           setLeanIndex(-1);
           setLeanError("ERROR");
         }
+        setWaitVisibility("invisible");
       });
   };
 
   const handleAskState = (index) => {
     return (event) => {
       const toSend = genToSend(index);
+      setWaitVisibility("visible");
       askState(toSend)
-        .then((response) => changeWithResponse(response.data))
+        .then((response) => {
+          changeWithResponse(response.data);
+          setWaitVisibility("invisible");
+        })
         .catch((error) => {
           if (error.response && error.response.data.detail) {
             setLeanIndex(index);
@@ -250,6 +261,7 @@ function MainView() {
             setLeanIndex(index);
             setLeanError("ERROR");
           }
+          setWaitVisibility("invisible");
         });
     };
   };
@@ -280,9 +292,7 @@ function MainView() {
           </InputGroup>
         </Col>
         <Col xs={4}>
-          <h2>
-            GOAL STATE
-          </h2>
+          <h2>GOAL STATE</h2>
         </Col>
       </Row>
       <Row className="mb-3">
@@ -347,6 +357,25 @@ function MainView() {
           +
         </Button>
       </Row>
+      <div
+        className={
+          "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
+          " " +
+          waitVisibility
+        }
+      >
+        <div
+          className={"fixed-top w-100 h-100 bg-dark"}
+          style={{ opacity: 0.6 }}
+        />
+        <Spinner
+          animation="border"
+          role="status"
+          style={{ width: "5rem", height: "5rem" }}
+        >
+          <span className="sr-only">Loading...</span>
+        </Spinner>
+      </div>
     </Container>
   );
 }
