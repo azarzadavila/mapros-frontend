@@ -10,6 +10,12 @@ import {
 } from "react-bootstrap";
 import { askState } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
+import { addStyles, StaticMathField } from "react-mathquill";
+addStyles();
+
+function splitLatex(s) {
+  return s.split("$");
+}
 
 function HypothesisLine({ ident, text, onChange, onDelete }) {
   return (
@@ -26,6 +32,37 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
         </InputGroup>
       </Col>
     </Row>
+  );
+}
+
+const getOutput = (index, value) => {
+  if (index % 2 === 0) {
+    return <span key={index}>{value}</span>;
+  } else {
+    return <StaticMathField key={index}>{value}</StaticMathField>;
+  }
+};
+
+function Sentence({ ident, sentence }) {
+  return (
+    <Row className="mb-3">
+      <Col xs={8}>
+        <Alert variant="dark">
+          ({ident}) :{" "}
+          {splitLatex(sentence).map((val, index) => getOutput(index, val))}
+        </Alert>
+      </Col>
+    </Row>
+  );
+}
+
+function Goal({ goal }) {
+  return (
+    <Col xs={4}>
+      <Alert variant="dark">
+        {splitLatex(goal).map((val, index) => getOutput(index, val))}
+      </Alert>
+    </Col>
   );
 }
 
@@ -61,18 +98,14 @@ function ProofLine({
             </InputGroup.Append>
           </InputGroup>
         </Col>
-        <Col xs={4}>
-          <Alert variant="dark">{goal}</Alert>
-        </Col>
+        <Goal goal={goal} />
       </Row>
       {sentences.map((sentence, index) => (
-        <Row className="mb-3" key={index}>
-          <Col xs={8}>
-            <Alert variant="dark">
-              ({sentence.ident}) : {sentence.sentence}
-            </Alert>
-          </Col>
-        </Row>
+        <Sentence
+          key={index}
+          ident={sentence.ident}
+          sentence={sentence.sentence}
+        />
       ))}
       {leanAlert}
     </>
@@ -283,9 +316,7 @@ function MainView() {
             S
           </Button>
         </Col>
-        <Col xs={4}>
-          <Alert variant="dark">{initialMessage}</Alert>
-        </Col>
+        <Goal goal={initialMessage} />
       </Row>
       {leanInitMsg}
       {proofs.map((proof, index) => {
