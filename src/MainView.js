@@ -291,9 +291,6 @@ function MainView() {
       <Row>
         <Col xs={8}>
           Proof:
-          <Button className="ml-3 mb-3" onClick={addProof}>
-            +
-          </Button>
           <Button className="ml-3 mb-3" onClick={askStateInitial}>
             S
           </Button>
@@ -321,6 +318,11 @@ function MainView() {
           />
         );
       })}
+      <Row>
+        <Button className="ml-3 mb-3" onClick={addProof}>
+          +
+        </Button>
+      </Row>
     </Container>
   );
 }
