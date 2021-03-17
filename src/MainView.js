@@ -18,6 +18,14 @@ function splitLatex(s) {
   return s.split("$");
 }
 
+function replaceMathbb(match, group0) {
+  return "\\" + group0;
+}
+
+function preprocessLatex(s) {
+  return s.replace(/\\mathbb\{(\w)\}/g, replaceMathbb);
+}
+
 function HypothesisLine({ ident, text, onChange, onDelete }) {
   return (
     <Row className="mb-3">
@@ -40,7 +48,9 @@ const getOutput = (index, value) => {
   if (index % 2 === 0) {
     return <span key={index}>{value}</span>;
   } else {
-    return <StaticMathField key={index}>{value}</StaticMathField>;
+    return (
+      <StaticMathField key={index}>{preprocessLatex(value)}</StaticMathField>
+    );
   }
 };
 

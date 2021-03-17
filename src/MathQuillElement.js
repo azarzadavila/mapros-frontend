@@ -23,7 +23,6 @@ function reducer(state, action) {
     case "update":
       newItems = state.items.slice();
       newItems[action.index].value = action.value;
-      action.setValue(joinInputs(newItems));
       return Object.assign({}, state, { items: newItems });
     case "add":
       start = state.items.slice(0, action.index + 1);
@@ -85,6 +84,7 @@ const MathQuillElement = ({ setValue }) => {
   const [elRefs, dispatchRef] = useReducer(reducerRefs, initialRef);
   useEffect(() => {
     dispatchRef({ type: "effect", length: state.items.length });
+    setValue(joinInputs(state.items)); // TODO THIS IS TOO OFTEN A FLAG TO_UPDATE SHOULD BE USED
   }, [state]);
   const getChangeInput = (index) => {
     if (index % 2 === 0) {
