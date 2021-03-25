@@ -16,4 +16,4 @@ Instructions are available for
 * The proof for the sandiwch theorem available at this [link](http://wwwf.imperial.ac.uk/~buzzard/docs/lean/sandwich.html)
   is used for testing.   
 * The project [react-mathquill](https://github.com/viktorstrate/react-mathquill) is used to render math formulas.
-* 
+* [react-bootstrap](https://react-bootstrap.github.io/) framework is used.
