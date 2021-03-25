@@ -4,16 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
 import Menu from "./menu";
 import Login from "./Login";
-import CheckSentence from "./CheckSentence";
 import { cookies, ROOT_URL } from "./Constants";
-import ProofEditor from "./ProofEditor";
-import SentenceToXml from "./SentenceToXml";
-import StandAloneProof from "./StandAloneProof";
-import { FormalCommuncation } from "./FormalCommunication";
-import MathQuillTest from "./MathQuillTest";
-import UseReducerTest from "./UseReducerTest";
-import Intervals from "./Intervals";
-import LeanView from "./LeanView";
 import MainView from "./MainView";
 import TestMainView from "./TestMainView";
 
@@ -45,14 +36,14 @@ class App extends React.Component {
       main: <div></div>,
     };
   }
-
-  componentDidMount() {
+  onCheckAuth() {
     checkAuth().then((response) => {
       response
         ? this.setState({ main: <Redirect to="/menu/" /> })
         : this.setState({ main: <Redirect to="/login/" /> });
     });
   }
+  componentDidMount() {}
 
   render() {
     return (
@@ -60,23 +51,12 @@ class App extends React.Component {
         <Route
           exact={true}
           path="/"
-          render={() => {
-            return this.state.main;
-          }}
+          component={MainView}
         />
         <Route path="/login/" component={Login} />
         <Route path="/menu/" component={Menu} />
-        <Route path="/check_sentence/" component={CheckSentence} />
-        <Route path="/proof_editor/" component={ProofEditor} />
-        <Route path="/sentence_to_xml/" component={SentenceToXml} />
-        <Route path="/standalone_proof/" component={StandAloneProof} />
-        <Route path="/api-test/" component={FormalCommuncation} />
-        <Route path="/mathquill/" component={MathQuillTest} />
-        <Route path="/usereducer/" component={UseReducerTest} />
-        <Route path="/intervals/" component={Intervals} />
-        <Route path="/leanview/" component={LeanView} />
         <Route path="/main/" component={MainView} />
-        <Route path="/maintest/" component={TestMainView}/>
+        <Route path="/maintest/" component={TestMainView} />
       </Router>
     );
   }

@@ -41,48 +41,10 @@ function Menu() {
     <Container>
       <Row>
         <MenuItem
-          name="Named Statements"
-          img={logo_named_statements}
-          alt="Named Statements logo"
-          link="/proof_editor/"
-        />
-        <MenuItem name="Contexts" img={logo_contexts} alt="Contexts logo" />
-        <MenuItem
-          name="Definitions"
-          img={logo_definitions}
-          alt="Definitions logo"
-          link="/sentence_to_xml/"
-        />
-        <MenuItem name="Symbols" img={logo_symbols} alt="Symbols logo" />
-        <MenuItem
-          name="Sentence Check"
+          name="Main"
           img={logo_symbols}
-          alt="Symbols logo"
-          link="/check_sentence/"
-        />
-        <MenuItem
-          name="StandAlone Proof"
-          img={logo_symbols}
-          alt="Symbols logo"
-          link="/standalone_proof/"
-        />
-        <MenuItem
-          name="Test MathQuill"
-          img={logo_symbols}
-          alt="Symbols logo"
-          link="/mathquill/"
-        />
-        <MenuItem
-          name="Test UseReducer"
-          img={logo_symbols}
-          alt="Symbols logo"
-          link="/usereducer/"
-        />
-        <MenuItem
-          name="LeanView"
-          img={logo_symbols}
-          alt="Symbols logo"
-          link="/leanview/"
+          alt="Main"
+          link="/main/"
         />
       </Row>
     </Container>
