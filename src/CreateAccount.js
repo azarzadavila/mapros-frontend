@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Alert, Button, Container, Form, Row } from "react-bootstrap";
+import { createAccount } from "./MainCommunication";
 
 function CreateAccount() {
   const [firstName, setFirstName] = useState("");
@@ -28,16 +29,28 @@ function CreateAccount() {
         email.
       </Alert>
     );
-    setIsDisabled(true);
   };
   const setFailure = (message) => {
     setFeedBack(<Alert variant="danger">{message}</Alert>);
+    setIsDisabled(false);
   };
   const handleSubmit = (event) => {
     event.preventDefault(); // prevents the url to change directly
-    console.log("submit");
-    setSuccess();
-    // setFailure("A user with that email already exists");
+    setIsDisabled(true);
+    createAccount(firstName, lastName, email, password)
+      .then((response) => {
+        setSuccess();
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.detail) {
+          setFailure(error.response.data.detail);
+        } else if (error.response) {
+          console.log(error.response);
+          setFailure(JSON.stringify(error.response.data));
+        } else {
+          setFailure("ERROR");
+        }
+      });
   };
 
   return (

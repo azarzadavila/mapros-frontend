@@ -10,3 +10,12 @@ export function askState({ name, hypotheses, goal, proofs }) {
     proofs: proofs,
   });
 }
+
+export function createAccount(first_name, last_name, email, password) {
+  return axios.post(ROOT_URL + "create_account/", {
+    first_name: first_name,
+    last_name: last_name,
+    email: email,
+    password: password,
+  });
+}
