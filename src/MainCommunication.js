@@ -19,3 +19,10 @@ export function createAccount(first_name, last_name, email, password) {
     password: password,
   });
 }
+
+export function authenticate(username, password) {
+  return axios.post(ROOT_URL + "auth/", {
+    username: username,
+    password: password,
+  });
+}

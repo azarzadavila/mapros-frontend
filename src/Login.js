@@ -1,114 +1,88 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Alert, Col, FormControl, Row } from "react-bootstrap";
-import { Redirect } from "react-router-dom";
-import { cookies, ROOT_URL } from "./Constants";
+import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Link, Redirect } from "react-router-dom";
+import { cookies } from "./Constants";
+import { authenticate } from "./MainCommunication";
 
-class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: "",
-      password: "",
-      message: null,
-      redirect: null,
-    };
-    this.handleChangeUsername = this.handleChangeUsername.bind(this);
-    this.handleChangePassword = this.handleChangePassword.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChangeUsername(event) {
-    this.setState({ username: event.target.value });
-  }
-
-  handleChangePassword(event) {
-    this.setState({ password: event.target.value });
-  }
-
-  handleSubmit(event) {
-    fetch(ROOT_URL + "auth/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: this.state.username,
-        password: this.state.password,
-      }),
-    })
-      .then(
-        (response) => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error("Username or password incorrect.");
-        },
-        (networkError) => {
-          console.log(networkError.message);
-          throw new Error(networkError.message);
-        }
-      )
-      .then((jsonResponse) => {
-        if (jsonResponse) {
-          cookies.set("token", jsonResponse.token, { path: "/" });
-          this.setState({ redirect: "/menu/" });
-        }
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [feedback, setFeedback] = useState(<></>);
+  const [redirect, setRedirect] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const handleEmail = (event) => {
+    setEmail(event.target.value);
+  };
+  const handlePassword = (event) => {
+    setPassword(event.target.value);
+  };
+  const setFailure = (message) => {
+    setFeedback(<Alert variant="danger">{message}</Alert>);
+    setIsDisabled(false);
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault(); // prevents the url to change directly
+    setIsDisabled(true);
+    authenticate(email, password)
+      .then((response) => {
+        cookies.set("token", response.data.token, { path: "/" });
+        setRedirect(<Redirect to="/menu/" />);
       })
       .catch((error) => {
-        const message = (
-          <Row className={"justify-content-center mb-3"}>
-            <Col md={3}>
-              <Alert variant="danger">{error.message}</Alert>
-            </Col>
-          </Row>
-        );
-        this.setState({ message: message });
+        if (error.response && error.response.data.detail) {
+          setFailure(error.response.data.detail);
+        } else {
+          setFailure("ERROR");
+        }
       });
-    event.preventDefault();
-  }
-
-  render() {
-    if (this.state.redirect) {
-      return <Redirect to={this.state.redirect} />;
-    }
+  };
+  if (redirect) {
+    return redirect;
+  } else {
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          {this.state.message}
-          <Row className={"justify-content-center"}>
-            <Col md={3}>
-              <label>Username</label>
-              <FormControl
-                className="mb-3"
-                placeholder="Username"
-                type="text"
-                required
-                value={this.state.username}
-                onChange={this.handleChangeUsername}
-              />
-            </Col>
-          </Row>
-          <Row className={"justify-content-center"}>
-            <Col md={3}>
-              <label>Password</label>
-              <FormControl
-                className="mb-3"
-                placeholder="Password"
-                type="password"
-                required
-                value={this.state.password}
-                onChange={this.handleChangePassword}
-              />
-            </Col>
-          </Row>
-          <Row className={"justify-content-center"}>
-            <Col md={3}>
-              <FormControl type="submit" value="Sign In" />
-            </Col>
-          </Row>
-        </form>
-      </div>
+      <Container>
+        <Row className="justify-content-center mt-3">
+          <Col xs={6}>
+            <Form onSubmit={handleSubmit}>
+              <fieldset disabled={isDisabled}>
+                <Form.Group controlId="formEmail">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    placeholder="Enter email"
+                    value={email}
+                    onChange={handleEmail}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="formPassword">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={handlePassword}
+                    required
+                  />
+                </Form.Group>
+                <div className="w-100 justify-content-center d-flex">
+                  <Button variant="primary" type="submit">
+                    Sign In
+                  </Button>
+                </div>
+              </fieldset>
+            </Form>
+          </Col>
+        </Row>
+        <Row className="justify-content-center">
+          <Col xs={6} className="d-flex justify-content-between">
+            <Link>Forgot your password?</Link>
+            <Link to="/createaccount/">Create account</Link>
+          </Col>
+        </Row>
+        <Row className="mt-3 justify-content-center">{feedback}</Row>
+      </Container>
     );
   }
 }
