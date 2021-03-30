@@ -8,6 +8,9 @@ import { cookies, ROOT_URL } from "./Constants";
 import MainView from "./MainView";
 import TestMainView from "./TestMainView";
 import CreateAccount from "./CreateAccount";
+import ConfirmAccount from "./ConfirmAccount";
+import ResetPassword from "./ResetPassword";
+import AskReset from "./AskReset";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -55,6 +58,9 @@ class App extends React.Component {
         <Route path="/main/" component={MainView} />
         <Route path="/maintest/" component={TestMainView} />
         <Route path="/createaccount/" component={CreateAccount} />
+        <Route path="/confirm_account" component={ConfirmAccount} />
+        <Route path="/reset_password" component={ResetPassword} />
+        <Route path="/ask_reset/" component={AskReset} />
       </Router>
     );
   }

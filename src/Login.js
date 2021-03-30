@@ -77,7 +77,7 @@ function Login() {
         </Row>
         <Row className="justify-content-center">
           <Col xs={6} className="d-flex justify-content-between">
-            <Link>Forgot your password?</Link>
+            <Link to="/ask_reset/">Forgot your password?</Link>
             <Link to="/createaccount/">Create account</Link>
           </Col>
         </Row>
