@@ -11,6 +11,7 @@ import CreateAccount from "./CreateAccount";
 import ConfirmAccount from "./ConfirmAccount";
 import ResetPassword from "./ResetPassword";
 import AskReset from "./AskReset";
+import TestAPI from "./TestAPI";
 
 async function checkAuth() {
   const token = cookies.get("token");
@@ -61,6 +62,7 @@ class App extends React.Component {
         <Route path="/confirm_account" component={ConfirmAccount} />
         <Route path="/reset_password" component={ResetPassword} />
         <Route path="/ask_reset/" component={AskReset} />
+        <Route path="/test_api/" component={TestAPI} />
       </Router>
     );
   }
