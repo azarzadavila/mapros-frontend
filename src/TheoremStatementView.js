@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -9,9 +9,17 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { askState } from "./MainCommunication";
+import {
+  askState,
+  createTheoremStatement,
+  getOwnedTheoremStatement,
+  getTheoremStatement,
+  updateTheoremStatement,
+} from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
 import { addStyles, StaticMathField } from "react-mathquill";
+import { Redirect, useLocation, useHistory } from "react-router-dom";
+
 addStyles();
 
 function splitLatex(s) {
@@ -26,7 +34,12 @@ function preprocessLatex(s) {
   return s.replace(/\\mathbb\{(\w)\}/g, replaceMathbb);
 }
 
-function HypothesisLine({ ident, onChange, onDelete }) {
+function HypothesisLine({
+  ident,
+  onChange,
+  onDelete,
+  initItems = [{ id: 0, value: "" }],
+}) {
   return (
     <Row className="mb-3">
       <Col xs={8}>
@@ -34,7 +47,7 @@ function HypothesisLine({ ident, onChange, onDelete }) {
           <InputGroup.Prepend>
             <InputGroup.Text>{ident}</InputGroup.Text>
           </InputGroup.Prepend>
-          <MathQuillElement setValue={onChange} />
+          <MathQuillElement setValue={onChange} initItems={initItems} />
           <InputGroup.Append>
             <Button onClick={onDelete}>-</Button>
           </InputGroup.Append>
@@ -54,18 +67,33 @@ const getOutput = (index, value) => {
   }
 };
 
-function Sentence({ ident, sentence }) {
-  return (
-    <Row className="mb-3">
-      <Col xs={8}>
-        <Alert variant="dark">
-          ({ident}) :{" "}
-          {splitLatex(sentence).map((val, index) => getOutput(index, val))}
-        </Alert>
-      </Col>
-    </Row>
-  );
-}
+let lastHyp = 0;
+
+const genInitHypotheses = (hypotheses) => {
+  const lines = hypotheses.split("\n");
+  let res = lines.map(preprocessLatex);
+  res = res.map(splitLatex);
+  return res.map((child, ind) => {
+    const toRet = {
+      ident: "",
+      text: lines[ind],
+      id: lastHyp,
+      initItems: child.map((val, index) => {
+        return { id: index, value: val };
+      }),
+    };
+    lastHyp += 1;
+    return toRet;
+  });
+};
+
+const genInitGoal = (goal) => {
+  let res = splitLatex(preprocessLatex(goal));
+  const ret = res.map((val, index) => {
+    return { id: index, value: val };
+  });
+  return ret;
+};
 
 function Goal({ goal }) {
   return (
@@ -77,73 +105,55 @@ function Goal({ goal }) {
   );
 }
 
-function ProofLine({
-  onChange,
-  onDelete,
-  goal,
-  onAskState,
-  sentences,
-  leanMsg,
-}) {
-  let leanAlert;
-  if (leanMsg) {
-    leanAlert = (
-      <Row className="mb-3">
-        <Alert variant="primary" className="w-100">
-          {leanMsg}
-        </Alert>
-      </Row>
-    );
-  } else {
-    leanAlert = <></>;
-  }
-  return (
-    <>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <MathQuillElement setValue={onChange} />
-            <InputGroup.Append>
-              <Button onClick={onDelete}>-</Button>
-              <Button onClick={onAskState}>S</Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Col>
-        <Goal goal={goal} />
-      </Row>
-      {sentences.map((sentence, index) => (
-        <Sentence
-          key={index}
-          ident={sentence.ident}
-          sentence={sentence.sentence}
-        />
-      ))}
-      {leanAlert}
-    </>
-  );
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
 }
 
-let lastHyp = 0;
-let lastProof = 0;
-
-function MainView() {
+function TheoremStatementView() {
+  let query = useQuery();
+  const [redirect, setRedirect] = useState(null);
   const [hypotheses, setHypotheses] = useState([]);
-  const [proofs, setProofs] = useState([]);
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
   const [initialMessage, setInitialMessage] = useState("");
   const [leanError, setLeanError] = useState("NO MESSAGE");
-  const [leanIndex, setLeanIndex] = useState(-1);
   const [waitVisibility, setWaitVisibility] = useState("invisible");
+  const [initialGoal, setInitGoal] = useState(
+    <MathQuillElement setValue={setGoal} />
+  );
+  const [pingPong, setPingPong] = useState(true);
+  useEffect(() => {
+    const id = query.get("id");
+    if (id) {
+      getOwnedTheoremStatement(id)
+        .then((response) => {
+          setName(response.data.name);
+          setHypotheses(genInitHypotheses(response.data.hypotheses));
+          setGoal(response.data.goal);
+          const initGoalItems = genInitGoal(response.data.goal);
+          // TODO adding the <div> is hack to force re-rendering
+          setInitGoal(
+            <div>
+              <MathQuillElement setValue={setGoal} initItems={initGoalItems} />
+            </div>
+          );
+        })
+        .catch((error) => {
+          //TODO error
+          console.log(error);
+        });
+    }
+  }, [pingPong]);
   const onChangeName = (event) => {
     setName(event.target.value);
   };
-  const onChangeGoal = (value) => {
-    setGoal(value);
-  };
   const addHypothesis = (event) => {
     const newHypotheses = hypotheses.slice();
-    newHypotheses.push({ ident: "", text: "", id: lastHyp });
+    newHypotheses.push({
+      ident: "",
+      text: "",
+      id: lastHyp,
+    });
     setHypotheses(newHypotheses);
     lastHyp += 1;
   };
@@ -166,36 +176,9 @@ function MainView() {
     };
   };
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
-  const addProof = (event) => {
-    const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof, goal: "", sentences: [] });
-    setProofs(newProofs);
-    lastProof += 1;
-  };
-  const handleProofChange = (index) => {
-    return (value) => {
-      const newProofs = proofs.slice();
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].text = value;
-      setProofs(newProofs);
-    };
-  };
-  const handleProofDelete = deleteFromList(proofs, setProofs);
+
   const hypothesesContent = () => {
     return hypotheses.map((hypothesis) => hypothesis.text);
-  };
-  const proofsContent = (index) => {
-    const res = [];
-    for (let i = 0; i <= index; i++) {
-      res.push(proofs[i].text);
-    }
-    return res;
-  };
-  const clearAfter = (index, proofs) => {
-    for (let i = index; i < proofs.length; i++) {
-      proofs[i].goal = "";
-      proofs[i].sentences = [];
-    }
   };
   const changeWithResponse = (data) => {
     const newHypotheses = hypotheses.slice();
@@ -205,22 +188,11 @@ function MainView() {
     });
     setHypotheses(newHypotheses);
     setInitialMessage(data.initial_goal);
-    const newProofs = proofs.slice();
-    data.goals.forEach((state, index) => {
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].goal = state;
-    });
-    data.sentences.forEach((cur_sentences, index) => {
-      newProofs[index].sentences = cur_sentences;
-    });
-    clearAfter(data.goals.length, newProofs);
-    setLeanIndex(data.goals.length - 1);
     if (data.error) {
       setLeanError(data.error);
     } else {
       setLeanError("NO MESSAGE");
     }
-    setProofs(newProofs);
   };
 
   const genToSend = (index) => {
@@ -228,7 +200,7 @@ function MainView() {
       name: name,
       hypotheses: hypothesesContent(),
       goal: goal,
-      proofs: proofsContent(index),
+      proofs: [],
     };
   };
 
@@ -242,48 +214,46 @@ function MainView() {
       })
       .catch((error) => {
         if (error.response && error.response.data.detail) {
-          setLeanIndex(-1);
           setLeanError(error.response.data.detail);
         } else {
           console.log(error);
-          setLeanIndex(-1);
           setLeanError("ERROR");
         }
         setWaitVisibility("invisible");
       });
   };
-
-  const handleAskState = (index) => {
-    return (event) => {
-      const toSend = genToSend(index);
-      setWaitVisibility("visible");
-      askState(toSend)
+  const history = useHistory();
+  const handleSave = (event) => {
+    let hyps = hypothesesContent();
+    hyps = hyps.join("\n");
+    const toSend = { name: name, hypotheses: hyps, goal: goal };
+    const id = query.get("id");
+    if (id) {
+      console.log("ID BEFORE SEND " + id);
+      console.log(id);
+      updateTheoremStatement(id, toSend)
         .then((response) => {
-          changeWithResponse(response.data);
-          setWaitVisibility("invisible");
+          console.log(response);
+          history.replace("/owned_statement?id=" + response.data.id);
+          setPingPong(!pingPong);
         })
         .catch((error) => {
-          if (error.response && error.response.data.detail) {
-            setLeanIndex(index);
-            setLeanError(error.response.data.detail);
-          } else {
-            console.log(error);
-            setLeanIndex(index);
-            setLeanError("ERROR");
-          }
-          setWaitVisibility("invisible");
+          console.log(error);
         });
-    };
+    } else {
+      createTheoremStatement(toSend)
+        .then((response) => {
+          console.log(response);
+          history.replace("/owned_statement?id=" + response.data.id);
+          setPingPong(!pingPong);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
-  let leanInitMsg;
-  if (leanIndex === -1) {
-    leanInitMsg = (
-      <Alert className="w-100" variant="primary">
-        {leanError}
-      </Alert>
-    );
-  } else {
-    leanInitMsg = <></>;
+  if (redirect) {
+    return redirect;
   }
   return (
     <Container>
@@ -301,8 +271,19 @@ function MainView() {
             />
           </InputGroup>
         </Col>
-        <Col xs={4}>
-          <h2>GOAL STATE</h2>
+        <Col xs={2}>
+          <Button onClick={handleSave}>Save</Button>
+        </Col>
+        <Col xs={2}>
+          <Button
+            onClick={() => {
+              const id = query.get("id");
+              const path = "/send_statement?id=" + id;
+              setRedirect(<Redirect to={path} push />);
+            }}
+          >
+            Send
+          </Button>
         </Col>
       </Row>
       <Row className="mb-3">
@@ -321,6 +302,7 @@ function MainView() {
             key={hypothesis.id}
             onChange={handleHypothesisChange(index)}
             onDelete={handleHypothesisDelete(index)}
+            initItems={hypothesis.initItems}
           />
         );
       })}
@@ -330,9 +312,7 @@ function MainView() {
         </Col>
       </Row>
       <Row className="mb-3">
-        <Col xs={8}>
-          <MathQuillElement setValue={onChangeGoal} />
-        </Col>
+        <Col xs={8}>{initialGoal}</Col>
       </Row>
       <Row>
         <Col xs={8}>
@@ -343,30 +323,9 @@ function MainView() {
         </Col>
         <Goal goal={initialMessage} />
       </Row>
-      {leanInitMsg}
-      {proofs.map((proof, index) => {
-        let leanMsg = null;
-        if (index === leanIndex) {
-          leanMsg = leanError;
-        }
-        return (
-          <ProofLine
-            text={proof.text}
-            goal={proof.goal}
-            key={proof.id}
-            onChange={handleProofChange(index)}
-            onDelete={handleProofDelete(index)}
-            onAskState={handleAskState(index)}
-            sentences={proof.sentences}
-            leanMsg={leanMsg}
-          />
-        );
-      })}
-      <Row>
-        <Button className="ml-3 mb-3" onClick={addProof}>
-          +
-        </Button>
-      </Row>
+      <Alert className="w-100" variant="primary">
+        {leanError}
+      </Alert>
       <div
         className={
           "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
@@ -390,4 +349,4 @@ function MainView() {
   );
 }
 
-export default MainView;
+export default TheoremStatementView;

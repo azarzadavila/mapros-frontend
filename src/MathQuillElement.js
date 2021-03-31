@@ -77,9 +77,9 @@ function reducerRefs(state, action) {
       throw new Error();
   }
 }
-const MathQuillElement = ({ setValue }) => {
+const MathQuillElement = ({ setValue, initItems = [{ id: 0, value: "" }] }) => {
   const initialRef = { array: [] };
-  const initialState = { lastId: 0, items: [{ id: 0, value: "" }] };
+  const initialState = { lastId: initItems.length, items: initItems };
   const [state, dispatch] = useReducer(reducer, initialState);
   const [elRefs, dispatchRef] = useReducer(reducerRefs, initialRef);
   useEffect(() => {

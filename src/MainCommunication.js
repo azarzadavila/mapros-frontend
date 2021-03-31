@@ -1,6 +1,15 @@
-import { ROOT_URL } from "./Constants";
+import { cookies, ROOT_URL } from "./Constants";
 
 const axios = require("axios").default;
+
+function genHeader() {
+  const token = cookies.get("token");
+  return { Authorization: "Token " + token };
+}
+
+export function checkToken(token) {
+  return axios.post(ROOT_URL + "auth/check/", { token: token });
+}
 
 export function askState({ name, hypotheses, goal, proofs }) {
   return axios.post(ROOT_URL + "ask_state/", {
@@ -59,4 +68,42 @@ export function askReset(email) {
       window.location.port +
       "/reset_password",
   });
+}
+
+export function listOwnedTheoremStatements() {
+  return axios.get(ROOT_URL + "owned_theorem_statements/", {
+    headers: genHeader(),
+  });
+}
+
+export function getOwnedTheoremStatement(id) {
+  return axios.get(ROOT_URL + "owned_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function createTheoremStatement(data) {
+  return axios.post(ROOT_URL + "owned_theorem_statements/", data, {
+    headers: genHeader(),
+  });
+}
+
+export function updateTheoremStatement(id, data) {
+  return axios.put(ROOT_URL + "owned_theorem_statement/" + id + "/", data, {
+    headers: genHeader(),
+  });
+}
+
+export function listUsersNotAssignedStatement(id) {
+  return axios.get(ROOT_URL + "list_users_not_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function sendStatement(statement_id, users) {
+  return axios.post(
+    ROOT_URL + "send_statement/",
+    { theorem_statement: statement_id, users: users },
+    { headers: genHeader() }
+  );
 }
