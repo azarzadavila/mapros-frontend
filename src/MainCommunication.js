@@ -2,6 +2,10 @@ import { ROOT_URL } from "./Constants";
 
 const axios = require("axios").default;
 
+export function checkToken(token) {
+  return axios.post(ROOT_URL + "auth/check/", { token: token });
+}
+
 export function askState({ name, hypotheses, goal, proofs }) {
   return axios.post(ROOT_URL + "ask_state/", {
     name: name,
