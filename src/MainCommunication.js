@@ -1,6 +1,11 @@
-import { ROOT_URL } from "./Constants";
+import { cookies, ROOT_URL } from "./Constants";
 
 const axios = require("axios").default;
+
+function genHeader() {
+  const token = cookies.get("token");
+  return { Authorization: "Token " + token };
+}
 
 export function checkToken(token) {
   return axios.post(ROOT_URL + "auth/check/", { token: token });
@@ -62,5 +67,11 @@ export function askReset(email) {
       ":" +
       window.location.port +
       "/reset_password",
+  });
+}
+
+export function listOwnedTheoremStatements() {
+  return axios.get(ROOT_URL + "owned_theorem_statements/", {
+    headers: genHeader(),
   });
 }

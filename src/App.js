@@ -14,6 +14,7 @@ import AskReset from "./AskReset";
 import TestAPI from "./TestAPI";
 import { checkToken } from "./MainCommunication";
 import Switch from "react-bootstrap/Switch";
+import ListOwnedTheoremStatements from "./ListOwnedTheoremStatements";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -60,6 +61,10 @@ function App() {
         <Route path="/reset_password" component={ResetPassword} />
         <Route path="/ask_reset/" component={AskReset} />
         <AuthenticatedRoute path="/test_api/" component={<TestAPI />} />
+        <AuthenticatedRoute
+          path="/list_owned_statements/"
+          component={<ListOwnedTheoremStatements />}
+        />
       </Switch>
     </Router>
   );
