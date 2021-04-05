@@ -107,3 +107,9 @@ export function sendStatement(statement_id, users) {
     { headers: genHeader() }
   );
 }
+
+export function getTheoremProof(id) {
+  return axios.get(ROOT_URL + "theorem_proof/" + id + "/", {
+    headers: genHeader(),
+  });
+}

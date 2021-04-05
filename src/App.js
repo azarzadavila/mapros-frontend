@@ -19,6 +19,7 @@ import TheoremStatementView from "./TheoremStatementView";
 import OwnedTheoremStatement from "./OwnedTheoremStatement";
 import ParentTheoremStatementView from "./TheoremStatementView";
 import SendTheoremStatement from "./SendTheoremStatement";
+import TheoremProofView from "./TheoremProofView";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -76,6 +77,10 @@ function App() {
         <AuthenticatedRoute
           path="/send_statement"
           component={<SendTheoremStatement />}
+        />
+        <AuthenticatedRoute
+          path="/theorem_proof"
+          component={<TheoremProofView />}
         />
       </Switch>
     </Router>
