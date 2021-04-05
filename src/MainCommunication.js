@@ -75,3 +75,35 @@ export function listOwnedTheoremStatements() {
     headers: genHeader(),
   });
 }
+
+export function getOwnedTheoremStatement(id) {
+  return axios.get(ROOT_URL + "owned_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function createTheoremStatement(data) {
+  return axios.post(ROOT_URL + "owned_theorem_statements/", data, {
+    headers: genHeader(),
+  });
+}
+
+export function updateTheoremStatement(id, data) {
+  return axios.put(ROOT_URL + "owned_theorem_statement/" + id + "/", data, {
+    headers: genHeader(),
+  });
+}
+
+export function listUsersNotAssignedStatement(id) {
+  return axios.get(ROOT_URL + "list_users_not_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function sendStatement(statement_id, users) {
+  return axios.post(
+    ROOT_URL + "send_statement/",
+    { theorem_statement: statement_id, users: users },
+    { headers: genHeader() }
+  );
+}

@@ -40,11 +40,12 @@ function Menu() {
   return (
     <Container>
       <Row>
+        <MenuItem name="Main" img={logo_symbols} alt="Main" link="/main/" />
         <MenuItem
-          name="Main"
-          img={logo_symbols}
-          alt="Main"
-          link="/main/"
+          name="List of owned statements"
+          img={logo_definitions}
+          alt="List of owned statements"
+          link="/list_owned_statements/"
         />
       </Row>
     </Container>

@@ -15,6 +15,10 @@ import TestAPI from "./TestAPI";
 import { checkToken } from "./MainCommunication";
 import Switch from "react-bootstrap/Switch";
 import ListOwnedTheoremStatements from "./ListOwnedTheoremStatements";
+import TheoremStatementView from "./TheoremStatementView";
+import OwnedTheoremStatement from "./OwnedTheoremStatement";
+import ParentTheoremStatementView from "./TheoremStatementView";
+import SendTheoremStatement from "./SendTheoremStatement";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -64,6 +68,14 @@ function App() {
         <AuthenticatedRoute
           path="/list_owned_statements/"
           component={<ListOwnedTheoremStatements />}
+        />
+        <AuthenticatedRoute
+          path="/owned_statement"
+          component={<TheoremStatementView />}
+        />
+        <AuthenticatedRoute
+          path="/send_statement"
+          component={<SendTheoremStatement />}
         />
       </Switch>
     </Router>

@@ -1,28 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  ListGroup,
-  ListGroupItem,
-  Row,
-} from "react-bootstrap";
+import { Alert, Button, Container, ListGroup, Row } from "react-bootstrap";
 import { listOwnedTheoremStatements } from "./MainCommunication";
-
-const genFake = () => {
-  const res = [];
-  for (let i = 0; i < 100; i++) {
-    res.push({ name: "theo" + i, id: i });
-  }
-  return res;
-};
+import { Redirect } from "react-router-dom";
 
 function ListOwnedTheoremStatements() {
   const [children, setChildren] = useState([]);
   const [feedback, setFeedback] = useState(
     <Alert variant="primary">Loading...</Alert>
   );
+  const [redirect, setRedirect] = useState(null);
   useEffect(() => {
     listOwnedTheoremStatements()
       .then((response) => {
@@ -45,11 +31,20 @@ function ListOwnedTheoremStatements() {
         }
       });
   }, []);
+  if (redirect) {
+    return redirect;
+  }
   return (
     <Container className="vh-100">
       <Row className="justify-content-between mt-3 mb-3">
         <h2>List of owned theorem statements</h2>
-        <Button>New theorem statement</Button>
+        <Button
+          onClick={() => {
+            setRedirect(<Redirect to="/owned_statement/" push />);
+          }}
+        >
+          New theorem statement
+        </Button>
       </Row>
       <Row>{feedback}</Row>
       <Row className="h-75">
@@ -59,9 +54,17 @@ function ListOwnedTheoremStatements() {
               <ListGroup.Item
                 className="justify-content-between d-flex"
                 key={child.id}
-                action
               >
-                {child.name}
+                <Button
+                  onClick={() => {
+                    setRedirect(
+                      <Redirect to={"/owned_statement?id=" + child.id} push />
+                    );
+                  }}
+                  className="w-100 d-flex justify-content-start border-0 bg-transparent text-body"
+                >
+                  {child.name}
+                </Button>
                 <Button className="btn-sm btn-danger">X</Button>
               </ListGroup.Item>
             );
