@@ -26,7 +26,10 @@ function Login() {
     setIsDisabled(true);
     authenticate(email, password)
       .then((response) => {
-        cookies.set("token", response.data.token, { path: "/" });
+        cookies.set("token", response.data.token, {
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        });
         setRedirect(<Redirect to="/menu/" />);
       })
       .catch((error) => {
