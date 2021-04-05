@@ -100,10 +100,46 @@ export function listUsersNotAssignedStatement(id) {
   });
 }
 
+export function listUsersStatement(id) {
+  return axios.get(ROOT_URL + "list_users_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
 export function sendStatement(statement_id, users) {
   return axios.post(
     ROOT_URL + "send_statement/",
     { theorem_statement: statement_id, users: users },
     { headers: genHeader() }
   );
+}
+
+export function getTheoremProof(id) {
+  return axios.get(ROOT_URL + "theorem_proof/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function listTheoremProofs() {
+  return axios.get(ROOT_URL + "list_theorem_proofs/", { headers: genHeader() });
+}
+
+export function updateTheoremProof(id, proof) {
+  return axios.put(
+    ROOT_URL + "theorem_proof/" + id + "/",
+    { proof: proof },
+    { headers: genHeader() }
+  );
+}
+
+export function deleteStatement(id) {
+  return axios.delete(ROOT_URL + "owned_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function removeUserStatement(id) {
+  return axios.delete(ROOT_URL + "remove_user_statement/" + id + "/", {
+    headers: genHeader(),
+  });
 }

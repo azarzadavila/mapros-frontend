@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
+import {
+  Alert,
+  Button,
+  Col,
+  Container,
+  Form,
+  OverlayTrigger,
+  Row,
+  Tooltip,
+} from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { cookies } from "./Constants";
 import { authenticate } from "./MainCommunication";
@@ -26,7 +35,10 @@ function Login() {
     setIsDisabled(true);
     authenticate(email, password)
       .then((response) => {
-        cookies.set("token", response.data.token, { path: "/" });
+        cookies.set("token", response.data.token, {
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        });
         setRedirect(<Redirect to="/menu/" />);
       })
       .catch((error) => {
@@ -80,6 +92,16 @@ function Login() {
             <Link to="/ask_reset/">Forgot your password?</Link>
             <Link to="/createaccount/">Create account</Link>
           </Col>
+        </Row>
+        <Row className="justify-content-center">
+          <Button
+            className="btn-sm"
+            onClick={() => {
+              setRedirect(<Redirect to="/unauthenticated_menu/" push />);
+            }}
+          >
+            Connect without account
+          </Button>
         </Row>
         <Row className="mt-3 justify-content-center">{feedback}</Row>
       </Container>

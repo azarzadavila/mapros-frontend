@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
 import Menu from "./menu";
 import Login from "./Login";
 import { cookies } from "./Constants";
@@ -13,12 +18,13 @@ import ResetPassword from "./ResetPassword";
 import AskReset from "./AskReset";
 import TestAPI from "./TestAPI";
 import { checkToken } from "./MainCommunication";
-import Switch from "react-bootstrap/Switch";
 import ListOwnedTheoremStatements from "./ListOwnedTheoremStatements";
 import TheoremStatementView from "./TheoremStatementView";
-import OwnedTheoremStatement from "./OwnedTheoremStatement";
-import ParentTheoremStatementView from "./TheoremStatementView";
 import SendTheoremStatement from "./SendTheoremStatement";
+import TheoremProofView from "./TheoremProofView";
+import ListTheoremProofs from "./ListTheoremProofs";
+import UsersTheoremStatement from "./UsersTheoremStatement";
+import UnauthenticatedMenu from "./UnauthenticatedMenu";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -52,7 +58,7 @@ function AuthenticatedRoute({ path, component }) {
 function App() {
   return (
     <Router>
-      <Switch>
+      <Switch className="w-100">
         <Route exact={true} path="/">
           <Redirect to="/menu/" />
         </Route>
@@ -77,6 +83,19 @@ function App() {
           path="/send_statement"
           component={<SendTheoremStatement />}
         />
+        <AuthenticatedRoute
+          path="/theorem_proof"
+          component={<TheoremProofView />}
+        />
+        <AuthenticatedRoute
+          path="/list_theorem_proofs/"
+          component={<ListTheoremProofs />}
+        />
+        <AuthenticatedRoute
+          path="/users_statement"
+          component={<UsersTheoremStatement />}
+        />
+        <Route path="/unauthenticated_menu/" component={UnauthenticatedMenu} />
       </Switch>
     </Router>
   );

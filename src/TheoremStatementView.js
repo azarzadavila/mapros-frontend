@@ -1,38 +1,24 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import {
   askState,
   createTheoremStatement,
   getOwnedTheoremStatement,
-  getTheoremStatement,
   updateTheoremStatement,
 } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
-import { addStyles, StaticMathField } from "react-mathquill";
-import { Redirect, useLocation, useHistory } from "react-router-dom";
+import { addStyles } from "react-mathquill";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
+import {
+  deleteFromList,
+  Goal,
+  preprocessLatex,
+  splitLatex,
+} from "./MainViewUtils";
+import WaitingContainer from "./WaitingContainer";
+import { BackBanner } from "./LinkBanner";
 
 addStyles();
-
-function splitLatex(s) {
-  return s.split("$");
-}
-
-function replaceMathbb(match, group0) {
-  return "\\" + group0;
-}
-
-function preprocessLatex(s) {
-  return s.replace(/\\mathbb\{(\w)\}/g, replaceMathbb);
-}
 
 function HypothesisLine({
   ident,
@@ -57,16 +43,6 @@ function HypothesisLine({
   );
 }
 
-const getOutput = (index, value) => {
-  if (index % 2 === 0) {
-    return <span key={index}>{value}</span>;
-  } else {
-    return (
-      <StaticMathField key={index}>{preprocessLatex(value)}</StaticMathField>
-    );
-  }
-};
-
 let lastHyp = 0;
 
 const genInitHypotheses = (hypotheses) => {
@@ -89,21 +65,10 @@ const genInitHypotheses = (hypotheses) => {
 
 const genInitGoal = (goal) => {
   let res = splitLatex(preprocessLatex(goal));
-  const ret = res.map((val, index) => {
+  return res.map((val, index) => {
     return { id: index, value: val };
   });
-  return ret;
 };
-
-function Goal({ goal }) {
-  return (
-    <Col xs={4}>
-      <Alert variant="dark">
-        {splitLatex(goal).map((val, index) => getOutput(index, val))}
-      </Alert>
-    </Col>
-  );
-}
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -122,6 +87,7 @@ function TheoremStatementView() {
     <MathQuillElement setValue={setGoal} />
   );
   const [pingPong, setPingPong] = useState(true);
+  const [feedBack, setFeedBack] = useState(<></>);
   useEffect(() => {
     const id = query.get("id");
     if (id) {
@@ -163,16 +129,6 @@ function TheoremStatementView() {
       newHypotheses[index] = { ...newHypotheses[index] };
       newHypotheses[index].text = value;
       setHypotheses(newHypotheses);
-    };
-  };
-  const deleteFromList = (list, setList) => {
-    return (index) => {
-      return (event) => {
-        const newListStart = list.slice(0, index);
-        const newListEnd = list.slice(index + 1, list.length);
-        const newList = newListStart.concat(newListEnd);
-        setList(newList);
-      };
     };
   };
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
@@ -235,6 +191,8 @@ function TheoremStatementView() {
         .then((response) => {
           console.log(response);
           history.replace("/owned_statement?id=" + response.data.id);
+          setFeedBack(<Alert variant="success">Statement updated...</Alert>);
+          setTimeout(() => setFeedBack(<></>), 1000);
           setPingPong(!pingPong);
         })
         .catch((error) => {
@@ -245,6 +203,8 @@ function TheoremStatementView() {
         .then((response) => {
           console.log(response);
           history.replace("/owned_statement?id=" + response.data.id);
+          setFeedBack(<Alert variant="success">Statement created...</Alert>);
+          setTimeout(() => setFeedBack(<></>), 1000);
           setPingPong(!pingPong);
         })
         .catch((error) => {
@@ -256,96 +216,91 @@ function TheoremStatementView() {
     return redirect;
   }
   return (
-    <Container>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text>Theorem Name :</InputGroup.Text>
-            </InputGroup.Prepend>
-            <Form.Control
-              placeholder="name"
-              aria-label="name"
-              value={name}
-              onChange={onChangeName}
+    <BackBanner to="/list_owned_statements/">
+      <WaitingContainer waitVisibility={waitVisibility}>
+        <Row>{feedBack}</Row>
+        <Row className="mb-3">
+          <Col xs={6}>
+            <InputGroup>
+              <InputGroup.Prepend>
+                <InputGroup.Text>Theorem Name :</InputGroup.Text>
+              </InputGroup.Prepend>
+              <Form.Control
+                placeholder="name"
+                aria-label="name"
+                value={name}
+                onChange={onChangeName}
+              />
+            </InputGroup>
+          </Col>
+          <Col xs={2}>
+            <Button onClick={handleSave}>Save</Button>
+          </Col>
+          <Col xs={2}>
+            <Button
+              onClick={() => {
+                const id = query.get("id");
+                const path = "/send_statement?id=" + id;
+                setRedirect(<Redirect to={path} push />);
+              }}
+            >
+              Send
+            </Button>
+          </Col>
+          <Col xs={2}>
+            <Button
+              onClick={() => {
+                const id = query.get("id");
+                const path = "/users_statement?id=" + id;
+                setRedirect(<Redirect to={path} push />);
+              }}
+            >
+              Manage
+            </Button>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={4}>
+            If,
+            <Button className="ml-3" onClick={addHypothesis}>
+              +
+            </Button>
+          </Col>
+        </Row>
+        {hypotheses.map((hypothesis, index) => {
+          return (
+            <HypothesisLine
+              ident={hypothesis.ident}
+              text={hypothesis.text}
+              key={hypothesis.id}
+              onChange={handleHypothesisChange(index)}
+              onDelete={handleHypothesisDelete(index)}
+              initItems={hypothesis.initItems}
             />
-          </InputGroup>
-        </Col>
-        <Col xs={2}>
-          <Button onClick={handleSave}>Save</Button>
-        </Col>
-        <Col xs={2}>
-          <Button
-            onClick={() => {
-              const id = query.get("id");
-              const path = "/send_statement?id=" + id;
-              setRedirect(<Redirect to={path} push />);
-            }}
-          >
-            Send
-          </Button>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={4}>
-          If,
-          <Button className="ml-3" onClick={addHypothesis}>
-            +
-          </Button>
-        </Col>
-      </Row>
-      {hypotheses.map((hypothesis, index) => {
-        return (
-          <HypothesisLine
-            ident={hypothesis.ident}
-            text={hypothesis.text}
-            key={hypothesis.id}
-            onChange={handleHypothesisChange(index)}
-            onDelete={handleHypothesisDelete(index)}
-            initItems={hypothesis.initItems}
-          />
-        );
-      })}
-      <Row>
-        <Col xs={8}>
-          <label>Then,</label>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={8}>{initialGoal}</Col>
-      </Row>
-      <Row>
-        <Col xs={8}>
-          Proof:
-          <Button className="ml-3 mb-3" onClick={askStateInitial}>
-            S
-          </Button>
-        </Col>
-        <Goal goal={initialMessage} />
-      </Row>
-      <Alert className="w-100" variant="primary">
-        {leanError}
-      </Alert>
-      <div
-        className={
-          "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
-          " " +
-          waitVisibility
-        }
-      >
-        <div
-          className={"fixed-top w-100 h-100 bg-dark"}
-          style={{ opacity: 0.6 }}
-        />
-        <Spinner
-          animation="border"
-          role="status"
-          style={{ width: "5rem", height: "5rem" }}
-        >
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      </div>
-    </Container>
+          );
+        })}
+        <Row>
+          <Col xs={8}>
+            <label>Then,</label>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={8}>{initialGoal}</Col>
+        </Row>
+        <Row>
+          <Col xs={8}>
+            Proof:
+            <Button className="ml-3 mb-3" onClick={askStateInitial}>
+              S
+            </Button>
+          </Col>
+          <Goal goal={initialMessage} />
+        </Row>
+        <Alert className="w-100" variant="primary">
+          {leanError}
+        </Alert>
+      </WaitingContainer>
+    </BackBanner>
   );
 }
 

@@ -69,11 +69,11 @@ function SendTheoremStatement() {
     const statementId = query.get("id");
     sendStatement(statementId, usersToSend)
       .then((response) => {
-        setFeedback(
-          <Alert variant="success">Statement sent ! Returning to menu...</Alert>
-        );
+        setFeedback(<Alert variant="success">Statement sent...</Alert>);
         setTimeout(() => {
-          setRedirect(<Redirect to="/menu/" push />);
+          setRedirect(
+            <Redirect to={"/owned_statement?id=" + statementId} push />
+          );
         }, 2000);
       })
       .catch((error) => {
