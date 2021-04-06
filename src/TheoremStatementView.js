@@ -1,38 +1,17 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import {
   askState,
   createTheoremStatement,
   getOwnedTheoremStatement,
-  getTheoremStatement,
-  updateTheoremStatement,
+  updateTheoremStatement
 } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
-import { addStyles, StaticMathField } from "react-mathquill";
-import { Redirect, useLocation, useHistory } from "react-router-dom";
+import { addStyles } from "react-mathquill";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
+import { Goal, preprocessLatex, splitLatex } from "./MainViewUtils";
 
 addStyles();
-
-function splitLatex(s) {
-  return s.split("$");
-}
-
-function replaceMathbb(match, group0) {
-  return "\\" + group0;
-}
-
-function preprocessLatex(s) {
-  return s.replace(/\\mathbb\{(\w)\}/g, replaceMathbb);
-}
 
 function HypothesisLine({
   ident,
@@ -56,16 +35,6 @@ function HypothesisLine({
     </Row>
   );
 }
-
-const getOutput = (index, value) => {
-  if (index % 2 === 0) {
-    return <span key={index}>{value}</span>;
-  } else {
-    return (
-      <StaticMathField key={index}>{preprocessLatex(value)}</StaticMathField>
-    );
-  }
-};
 
 let lastHyp = 0;
 
@@ -94,16 +63,6 @@ const genInitGoal = (goal) => {
   });
   return ret;
 };
-
-function Goal({ goal }) {
-  return (
-    <Col xs={4}>
-      <Alert variant="dark">
-        {splitLatex(goal).map((val, index) => getOutput(index, val))}
-      </Alert>
-    </Col>
-  );
-}
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);

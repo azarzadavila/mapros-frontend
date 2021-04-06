@@ -11,71 +11,10 @@ import {
 } from "react-bootstrap";
 import { askState } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
-import { addStyles, StaticMathField } from "react-mathquill";
+import { addStyles } from "react-mathquill";
+import { clearAfter, Goal, HypothesisLine, Sentence } from "./MainViewUtils";
+
 addStyles();
-
-function splitLatex(s) {
-  return s.split("$");
-}
-
-function replaceMathbb(match, group0) {
-  return "\\" + group0;
-}
-
-function preprocessLatex(s) {
-  return s.replace(/\\mathbb\{(\w)\}/g, replaceMathbb);
-}
-
-function HypothesisLine({ ident, onChange, onDelete }) {
-  return (
-    <Row className="mb-3">
-      <Col xs={8}>
-        <InputGroup>
-          <InputGroup.Prepend>
-            <InputGroup.Text>{ident}</InputGroup.Text>
-          </InputGroup.Prepend>
-          <MathQuillElement setValue={onChange} />
-          <InputGroup.Append>
-            <Button onClick={onDelete}>-</Button>
-          </InputGroup.Append>
-        </InputGroup>
-      </Col>
-    </Row>
-  );
-}
-
-const getOutput = (index, value) => {
-  if (index % 2 === 0) {
-    return <span key={index}>{value}</span>;
-  } else {
-    return (
-      <StaticMathField key={index}>{preprocessLatex(value)}</StaticMathField>
-    );
-  }
-};
-
-function Sentence({ ident, sentence }) {
-  return (
-    <Row className="mb-3">
-      <Col xs={8}>
-        <Alert variant="dark">
-          ({ident}) :{" "}
-          {splitLatex(sentence).map((val, index) => getOutput(index, val))}
-        </Alert>
-      </Col>
-    </Row>
-  );
-}
-
-function Goal({ goal }) {
-  return (
-    <Col xs={4}>
-      <Alert variant="dark">
-        {splitLatex(goal).map((val, index) => getOutput(index, val))}
-      </Alert>
-    </Col>
-  );
-}
 
 function ProofLine({
   onChange,
@@ -190,12 +129,6 @@ function MainView() {
       res.push(proofs[i].text);
     }
     return res;
-  };
-  const clearAfter = (index, proofs) => {
-    for (let i = index; i < proofs.length; i++) {
-      proofs[i].goal = "";
-      proofs[i].sentences = [];
-    }
   };
   const changeWithResponse = (data) => {
     const newHypotheses = hypotheses.slice();
