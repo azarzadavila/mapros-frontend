@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
+import { cookies } from "./Constants";
 
 export function LinkBanner({ children, to, btn, push }) {
   const [redirect, setRedirect] = useState(false);
@@ -25,14 +26,18 @@ export function LinkBanner({ children, to, btn, push }) {
 }
 
 export function MenuBanner({ children }) {
+  let path = "/unauthenticated_menu/";
+  if (cookies.get("token")) {
+    path = "/menu/";
+  }
   return (
-    <LinkBanner to="/menu/" push btn={"HOME"}>
+    <LinkBanner to={path} push btn={"HOME"}>
       {children}
     </LinkBanner>
   );
 }
 
-export function BackBanner({ to, children}) {
+export function BackBanner({ to, children }) {
   return (
     <LinkBanner to={to} btn={"BACK"}>
       {children}

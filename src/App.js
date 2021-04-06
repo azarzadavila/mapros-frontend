@@ -24,6 +24,7 @@ import SendTheoremStatement from "./SendTheoremStatement";
 import TheoremProofView from "./TheoremProofView";
 import ListTheoremProofs from "./ListTheoremProofs";
 import UsersTheoremStatement from "./UsersTheoremStatement";
+import UnauthenticatedMenu from "./UnauthenticatedMenu";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -94,6 +95,7 @@ function App() {
           path="/users_statement"
           component={<UsersTheoremStatement />}
         />
+        <Route path="/unauthenticated_menu/" component={UnauthenticatedMenu} />
       </Switch>
     </Router>
   );
