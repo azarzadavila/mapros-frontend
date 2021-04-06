@@ -1,27 +1,17 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { askState } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
 import { addStyles } from "react-mathquill";
 import {
-  clearAfter,
   deleteFromList,
   getChangeWithResponse,
   getHandleProofChange,
   Goal,
   HypothesisLine,
   ProofLine,
-  Sentence,
 } from "./MainViewUtils";
+import WaitingContainer from "./WaitingContainer";
 
 addStyles();
 
@@ -146,7 +136,7 @@ function MainView() {
     leanInitMsg = <></>;
   }
   return (
-    <Container>
+    <WaitingContainer waitVisibility={waitVisibility}>
       <Row className="mb-3">
         <Col xs={8}>
           <InputGroup>
@@ -227,26 +217,7 @@ function MainView() {
           +
         </Button>
       </Row>
-      <div
-        className={
-          "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
-          " " +
-          waitVisibility
-        }
-      >
-        <div
-          className={"fixed-top w-100 h-100 bg-dark"}
-          style={{ opacity: 0.6 }}
-        />
-        <Spinner
-          animation="border"
-          role="status"
-          style={{ width: "5rem", height: "5rem" }}
-        >
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      </div>
-    </Container>
+    </WaitingContainer>
   );
 }
 

@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Col, Container, Form, InputGroup, Row, Spinner } from "react-bootstrap";
+import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import {
   askState,
   createTheoremStatement,
   getOwnedTheoremStatement,
-  updateTheoremStatement
+  updateTheoremStatement,
 } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
 import { addStyles } from "react-mathquill";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import { deleteFromList, Goal, preprocessLatex, splitLatex } from "./MainViewUtils";
+import {
+  deleteFromList,
+  Goal,
+  preprocessLatex,
+  splitLatex,
+} from "./MainViewUtils";
+import WaitingContainer from "./WaitingContainer";
 
 addStyles();
 
@@ -204,7 +210,7 @@ function TheoremStatementView() {
     return redirect;
   }
   return (
-    <Container>
+    <WaitingContainer>
       <Row className="mb-3">
         <Col xs={8}>
           <InputGroup>
@@ -274,26 +280,7 @@ function TheoremStatementView() {
       <Alert className="w-100" variant="primary">
         {leanError}
       </Alert>
-      <div
-        className={
-          "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
-          " " +
-          waitVisibility
-        }
-      >
-        <div
-          className={"fixed-top w-100 h-100 bg-dark"}
-          style={{ opacity: 0.6 }}
-        />
-        <Spinner
-          animation="border"
-          role="status"
-          style={{ width: "5rem", height: "5rem" }}
-        >
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      </div>
-    </Container>
+    </WaitingContainer>
   );
 }
 

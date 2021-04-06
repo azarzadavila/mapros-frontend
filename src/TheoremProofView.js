@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Alert, Button, Col, Row } from "react-bootstrap";
 import {
   askState,
   getTheoremProof,
@@ -17,6 +17,7 @@ import {
   Sentence,
   splitLatex,
 } from "./MainViewUtils";
+import WaitingContainer from "./WaitingContainer";
 
 addStyles();
 
@@ -198,7 +199,7 @@ function TheoremProofView() {
     }
   };
   return (
-    <Container>
+    <WaitingContainer waitVisibility={waitVisibility}>
       <Row className="mb-3">
         <Col xs={8}>Theorem Name : {name}</Col>
         <Col xs={4}>
@@ -264,26 +265,7 @@ function TheoremProofView() {
           +
         </Button>
       </Row>
-      <div
-        className={
-          "fixed-top w-100 h-100 d-flex justify-content-center align-items-center" +
-          " " +
-          waitVisibility
-        }
-      >
-        <div
-          className={"fixed-top w-100 h-100 bg-dark"}
-          style={{ opacity: 0.6 }}
-        />
-        <Spinner
-          animation="border"
-          role="status"
-          style={{ width: "5rem", height: "5rem" }}
-        >
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      </div>
-    </Container>
+    </WaitingContainer>
   );
 }
 
