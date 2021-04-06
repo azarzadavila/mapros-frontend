@@ -61,6 +61,12 @@ function Menu() {
           alt="List of owned statements"
           link="/list_owned_statements/"
         />
+        <MenuItem
+          name="List of theorems to prove"
+          img={logo_definitions}
+          alt="List of theorems to prove"
+          link="/list_theorem_proofs/"
+        />
       </Row>
     </Container>
   );

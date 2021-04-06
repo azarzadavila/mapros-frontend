@@ -113,3 +113,7 @@ export function getTheoremProof(id) {
     headers: genHeader(),
   });
 }
+
+export function listTheoremProofs() {
+  return axios.get(ROOT_URL + "list_theorem_proofs/", { headers: genHeader() });
+}
