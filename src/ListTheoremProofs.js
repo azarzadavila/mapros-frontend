@@ -49,18 +49,14 @@ function ListTheoremProofs() {
                 <ListGroup.Item
                   className="justify-content-between d-flex"
                   key={child.id}
+                  action
+                  onClick={() => {
+                    setRedirect(
+                      <Redirect to={"/theorem_proof?id=" + child.id} push />
+                    );
+                  }}
                 >
-                  <Button
-                    onClick={() => {
-                      setRedirect(
-                        <Redirect to={"/theorem_proof?id=" + child.id} push />
-                      );
-                    }}
-                    className="w-100 d-flex justify-content-start border-0 bg-transparent text-body"
-                  >
-                    {child.theorem_statement.name}
-                  </Button>
-                  <Button className="btn-sm btn-danger">X</Button>
+                  {child.theorem_statement.name}
                 </ListGroup.Item>
               );
             })}

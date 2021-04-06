@@ -1,8 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Container, ListGroup, Row } from "react-bootstrap";
-import { listOwnedTheoremStatements } from "./MainCommunication";
+import {
+  Alert,
+  Button,
+  Container,
+  ListGroup,
+  Row,
+  Modal,
+} from "react-bootstrap";
+import {
+  deleteStatement,
+  listOwnedTheoremStatements,
+} from "./MainCommunication";
 import { Redirect } from "react-router-dom";
 import { MenuBanner } from "./LinkBanner";
+
+function DeleteModal({ onConfirm, onHide }) {
+  return (
+    <Modal show onHide={onHide} animation={false}>
+      <Modal.Header closeButton>
+        <Modal.Title>Confirmation</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <p>
+          Are you sure you want to delete the selected statement ? It will be
+          also deleted for all the people who received it.
+        </p>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide}>
+          Close
+        </Button>
+        <Button
+          variant="danger"
+          onClick={() => {
+            onConfirm();
+            onHide();
+          }}
+        >
+          Confirm
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
 
 function ListOwnedTheoremStatements() {
   const [children, setChildren] = useState([]);
@@ -10,7 +52,8 @@ function ListOwnedTheoremStatements() {
     <Alert variant="primary">Loading...</Alert>
   );
   const [redirect, setRedirect] = useState(null);
-  useEffect(() => {
+  const [modal, setModal] = useState(<></>);
+  const refresh = () => {
     listOwnedTheoremStatements()
       .then((response) => {
         setChildren(response.data);
@@ -31,12 +74,24 @@ function ListOwnedTheoremStatements() {
           setFeedback(<Alert variant="danger">{error.message}</Alert>);
         }
       });
-  }, []);
+  };
+  useEffect(refresh, []);
+  const handleDelete = (id) => {
+    deleteStatement(id)
+      .then((response) => {
+        setFeedback(<Alert variant="success">Delete successful...</Alert>);
+        setTimeout(() => refresh(), 1000);
+      })
+      .catch((error) => {
+        setFeedback(<Alert variant="danger">Failed to delete...</Alert>);
+      });
+  };
   if (redirect) {
     return redirect;
   }
   return (
     <MenuBanner>
+      {modal}
       <Container className="vh-100">
         <Row className="justify-content-between mt-3 mb-3">
           <h2>List of owned theorem statements</h2>
@@ -67,7 +122,23 @@ function ListOwnedTheoremStatements() {
                   >
                     {child.name}
                   </Button>
-                  <Button className="btn-sm btn-danger">X</Button>
+                  <Button
+                    className="btn-sm btn-danger"
+                    onClick={() => {
+                      setModal(
+                        <DeleteModal
+                          onConfirm={() => {
+                            handleDelete(child.id);
+                          }}
+                          onHide={() => {
+                            setModal(<></>);
+                          }}
+                        />
+                      );
+                    }}
+                  >
+                    X
+                  </Button>
                 </ListGroup.Item>
               );
             })}

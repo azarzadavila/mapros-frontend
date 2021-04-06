@@ -125,3 +125,9 @@ export function updateTheoremProof(id, proof) {
     { headers: genHeader() }
   );
 }
+
+export function deleteStatement(id) {
+  return axios.delete(ROOT_URL + "owned_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
