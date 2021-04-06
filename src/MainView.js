@@ -12,55 +12,18 @@ import {
 import { askState } from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
 import { addStyles } from "react-mathquill";
-import { clearAfter, Goal, HypothesisLine, Sentence } from "./MainViewUtils";
+import {
+  clearAfter,
+  deleteFromList,
+  getChangeWithResponse,
+  getHandleProofChange,
+  Goal,
+  HypothesisLine,
+  ProofLine,
+  Sentence,
+} from "./MainViewUtils";
 
 addStyles();
-
-function ProofLine({
-  onChange,
-  onDelete,
-  goal,
-  onAskState,
-  sentences,
-  leanMsg,
-}) {
-  let leanAlert;
-  if (leanMsg) {
-    leanAlert = (
-      <Row className="mb-3">
-        <Alert variant="primary" className="w-100">
-          {leanMsg}
-        </Alert>
-      </Row>
-    );
-  } else {
-    leanAlert = <></>;
-  }
-  return (
-    <>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <MathQuillElement setValue={onChange} />
-            <InputGroup.Append>
-              <Button onClick={onDelete}>-</Button>
-              <Button onClick={onAskState}>S</Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Col>
-        <Goal goal={goal} />
-      </Row>
-      {sentences.map((sentence, index) => (
-        <Sentence
-          key={index}
-          ident={sentence.ident}
-          sentence={sentence.sentence}
-        />
-      ))}
-      {leanAlert}
-    </>
-  );
-}
 
 let lastHyp = 0;
 let lastProof = 0;
@@ -77,9 +40,6 @@ function MainView() {
   const onChangeName = (event) => {
     setName(event.target.value);
   };
-  const onChangeGoal = (value) => {
-    setGoal(value);
-  };
   const addHypothesis = (event) => {
     const newHypotheses = hypotheses.slice();
     newHypotheses.push({ ident: "", text: "", id: lastHyp });
@@ -94,16 +54,6 @@ function MainView() {
       setHypotheses(newHypotheses);
     };
   };
-  const deleteFromList = (list, setList) => {
-    return (index) => {
-      return (event) => {
-        const newListStart = list.slice(0, index);
-        const newListEnd = list.slice(index + 1, list.length);
-        const newList = newListStart.concat(newListEnd);
-        setList(newList);
-      };
-    };
-  };
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
   const addProof = (event) => {
     const newProofs = proofs.slice();
@@ -111,14 +61,7 @@ function MainView() {
     setProofs(newProofs);
     lastProof += 1;
   };
-  const handleProofChange = (index) => {
-    return (value) => {
-      const newProofs = proofs.slice();
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].text = value;
-      setProofs(newProofs);
-    };
-  };
+  const handleProofChange = getHandleProofChange(proofs, setProofs);
   const handleProofDelete = deleteFromList(proofs, setProofs);
   const hypothesesContent = () => {
     return hypotheses.map((hypothesis) => hypothesis.text);
@@ -130,31 +73,15 @@ function MainView() {
     }
     return res;
   };
-  const changeWithResponse = (data) => {
-    const newHypotheses = hypotheses.slice();
-    data.hypotheses_ident.forEach((ident, index) => {
-      newHypotheses[index] = { ...newHypotheses[index] };
-      newHypotheses[index].ident = ident;
-    });
-    setHypotheses(newHypotheses);
-    setInitialMessage(data.initial_goal);
-    const newProofs = proofs.slice();
-    data.goals.forEach((state, index) => {
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].goal = state;
-    });
-    data.sentences.forEach((cur_sentences, index) => {
-      newProofs[index].sentences = cur_sentences;
-    });
-    clearAfter(data.goals.length, newProofs);
-    setLeanIndex(data.goals.length - 1);
-    if (data.error) {
-      setLeanError(data.error);
-    } else {
-      setLeanError("NO MESSAGE");
-    }
-    setProofs(newProofs);
-  };
+  const changeWithResponse = getChangeWithResponse(
+    hypotheses,
+    setHypotheses,
+    setInitialMessage,
+    proofs,
+    setLeanIndex,
+    setLeanError,
+    setProofs
+  );
 
   const genToSend = (index) => {
     return {
@@ -264,7 +191,7 @@ function MainView() {
       </Row>
       <Row className="mb-3">
         <Col xs={8}>
-          <MathQuillElement setValue={onChangeGoal} />
+          <MathQuillElement setValue={setGoal} />
         </Col>
       </Row>
       <Row>

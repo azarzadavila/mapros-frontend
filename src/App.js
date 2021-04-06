@@ -16,8 +16,6 @@ import { checkToken } from "./MainCommunication";
 import Switch from "react-bootstrap/Switch";
 import ListOwnedTheoremStatements from "./ListOwnedTheoremStatements";
 import TheoremStatementView from "./TheoremStatementView";
-import OwnedTheoremStatement from "./OwnedTheoremStatement";
-import ParentTheoremStatementView from "./TheoremStatementView";
 import SendTheoremStatement from "./SendTheoremStatement";
 import TheoremProofView from "./TheoremProofView";
 import ListTheoremProofs from "./ListTheoremProofs";

@@ -9,7 +9,7 @@ import {
 import MathQuillElement from "./MathQuillElement";
 import { addStyles } from "react-mathquill";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import { Goal, preprocessLatex, splitLatex } from "./MainViewUtils";
+import { deleteFromList, Goal, preprocessLatex, splitLatex } from "./MainViewUtils";
 
 addStyles();
 
@@ -58,10 +58,9 @@ const genInitHypotheses = (hypotheses) => {
 
 const genInitGoal = (goal) => {
   let res = splitLatex(preprocessLatex(goal));
-  const ret = res.map((val, index) => {
+  return res.map((val, index) => {
     return { id: index, value: val };
   });
-  return ret;
 };
 
 function useQuery() {
@@ -122,16 +121,6 @@ function TheoremStatementView() {
       newHypotheses[index] = { ...newHypotheses[index] };
       newHypotheses[index].text = value;
       setHypotheses(newHypotheses);
-    };
-  };
-  const deleteFromList = (list, setList) => {
-    return (index) => {
-      return (event) => {
-        const newListStart = list.slice(0, index);
-        const newListEnd = list.slice(index + 1, list.length);
-        const newList = newListStart.concat(newListEnd);
-        setList(newList);
-      };
     };
   };
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);

@@ -1,79 +1,25 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  InputGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Alert, Button, Col, Container, Row, Spinner } from "react-bootstrap";
 import {
   askState,
   getTheoremProof,
   updateTheoremProof,
 } from "./MainCommunication";
-import MathQuillElement from "./MathQuillElement";
 import { addStyles } from "react-mathquill";
 import { useLocation } from "react-router-dom";
 import {
-  clearAfter,
+  deleteFromList,
+  getChangeWithResponse,
+  getHandleProofChange,
   Goal,
   preprocessLatex,
+  ProofLine,
   Sentence,
   splitLatex,
 } from "./MainViewUtils";
 
 addStyles();
 
-function ProofLine({
-  onChange,
-  onDelete,
-  goal,
-  onAskState,
-  sentences,
-  leanMsg,
-  initItems = [{ id: 0, value: "" }],
-}) {
-  let leanAlert;
-  if (leanMsg) {
-    leanAlert = (
-      <Row className="mb-3">
-        <Alert variant="primary" className="w-100">
-          {leanMsg}
-        </Alert>
-      </Row>
-    );
-  } else {
-    leanAlert = <></>;
-  }
-  return (
-    <>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <MathQuillElement setValue={onChange} initItems={initItems} />
-            <InputGroup.Append>
-              <Button onClick={onDelete}>-</Button>
-              <Button onClick={onAskState}>S</Button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Col>
-        <Goal goal={goal} />
-      </Row>
-      {sentences.map((sentence, index) => (
-        <Sentence
-          key={index}
-          ident={sentence.ident}
-          sentence={sentence.sentence}
-        />
-      ))}
-      {leanAlert}
-    </>
-  );
-}
-
-let lastHyp = 0;
 let lastProof = 0;
 
 const genInitHypotheses = (hypotheses) => {
@@ -118,16 +64,6 @@ function TheoremProofView() {
   const [leanIndex, setLeanIndex] = useState(-1);
   const [waitVisibility, setWaitVisibility] = useState("invisible");
   const [pingPong, setPingPong] = useState(true);
-  const deleteFromList = (list, setList) => {
-    return (index) => {
-      return (event) => {
-        const newListStart = list.slice(0, index);
-        const newListEnd = list.slice(index + 1, list.length);
-        const newList = newListStart.concat(newListEnd);
-        setList(newList);
-      };
-    };
-  };
   const addProof = (event) => {
     const newProofs = proofs.slice();
     newProofs.push({
@@ -140,14 +76,7 @@ function TheoremProofView() {
     setProofs(newProofs);
     lastProof += 1;
   };
-  const handleProofChange = (index) => {
-    return (value) => {
-      const newProofs = proofs.slice();
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].text = value;
-      setProofs(newProofs);
-    };
-  };
+  const handleProofChange = getHandleProofChange(proofs, setProofs);
   const handleProofDelete = deleteFromList(proofs, setProofs);
   const hypothesesContent = () => {
     return hypotheses.map((hypothesis) => hypothesis.value);
@@ -162,31 +91,15 @@ function TheoremProofView() {
   const proofsContentAll = () => {
     return proofs.map((proof) => proof.text);
   };
-  const changeWithResponse = (data) => {
-    const newHypotheses = hypotheses.slice();
-    data.hypotheses_ident.forEach((ident, index) => {
-      newHypotheses[index] = { ...newHypotheses[index] };
-      newHypotheses[index].ident = ident;
-    });
-    setHypotheses(newHypotheses);
-    setInitialMessage(data.initial_goal);
-    const newProofs = proofs.slice();
-    data.goals.forEach((state, index) => {
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].goal = state;
-    });
-    data.sentences.forEach((cur_sentences, index) => {
-      newProofs[index].sentences = cur_sentences;
-    });
-    clearAfter(data.goals.length, newProofs);
-    setLeanIndex(data.goals.length - 1);
-    if (data.error) {
-      setLeanError(data.error);
-    } else {
-      setLeanError("NO MESSAGE");
-    }
-    setProofs(newProofs);
-  };
+  const changeWithResponse = getChangeWithResponse(
+    hypotheses,
+    setHypotheses,
+    setInitialMessage,
+    proofs,
+    setLeanIndex,
+    setLeanError,
+    setProofs
+  );
 
   const genToSend = (index) => {
     return {
