@@ -23,6 +23,7 @@ import TheoremStatementView from "./TheoremStatementView";
 import SendTheoremStatement from "./SendTheoremStatement";
 import TheoremProofView from "./TheoremProofView";
 import ListTheoremProofs from "./ListTheoremProofs";
+import UsersTheoremStatement from "./UsersTheoremStatement";
 
 function AuthenticatedComponent({ component }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -88,6 +89,10 @@ function App() {
         <AuthenticatedRoute
           path="/list_theorem_proofs/"
           component={<ListTheoremProofs />}
+        />
+        <AuthenticatedRoute
+          path="/users_statement"
+          component={<UsersTheoremStatement />}
         />
       </Switch>
     </Router>

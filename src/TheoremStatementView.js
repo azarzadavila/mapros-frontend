@@ -218,7 +218,7 @@ function TheoremStatementView() {
       <WaitingContainer waitVisibility={waitVisibility}>
         <Row>{feedBack}</Row>
         <Row className="mb-3">
-          <Col xs={8}>
+          <Col xs={6}>
             <InputGroup>
               <InputGroup.Prepend>
                 <InputGroup.Text>Theorem Name :</InputGroup.Text>
@@ -243,6 +243,17 @@ function TheoremStatementView() {
               }}
             >
               Send
+            </Button>
+          </Col>
+          <Col xs={2}>
+            <Button
+              onClick={() => {
+                const id = query.get("id");
+                const path = "/users_statement?id=" + id;
+                setRedirect(<Redirect to={path} push />);
+              }}
+            >
+              Manage
             </Button>
           </Col>
         </Row>

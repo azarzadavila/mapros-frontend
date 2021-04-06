@@ -100,6 +100,12 @@ export function listUsersNotAssignedStatement(id) {
   });
 }
 
+export function listUsersStatement(id) {
+  return axios.get(ROOT_URL + "list_users_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
 export function sendStatement(statement_id, users) {
   return axios.post(
     ROOT_URL + "send_statement/",
@@ -128,6 +134,12 @@ export function updateTheoremProof(id, proof) {
 
 export function deleteStatement(id) {
   return axios.delete(ROOT_URL + "owned_theorem_statement/" + id + "/", {
+    headers: genHeader(),
+  });
+}
+
+export function removeUserStatement(id) {
+  return axios.delete(ROOT_URL + "remove_user_statement/" + id + "/", {
     headers: genHeader(),
   });
 }
