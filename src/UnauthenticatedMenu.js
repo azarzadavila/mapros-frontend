@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row } from "react-bootstrap";
-import logo_definitions from "./img/book-fill.svg";
 import logo_symbols from "./img/pi.svg";
 import "./menu.css";
 import { Redirect } from "react-router-dom";
-import { cookies } from "./Constants";
 import { MenuItem } from "./MenuUtils";
 
 function UnauthenticatedMenu() {

@@ -94,23 +94,14 @@ function Login() {
           </Col>
         </Row>
         <Row className="justify-content-center">
-          <OverlayTrigger
-            placement="bottom"
-            overlay={
-              <Tooltip id={`tooltip-$bottom`}>
-                Functionalities will be limited.
-              </Tooltip>
-            }
+          <Button
+            className="btn-sm"
+            onClick={() => {
+              setRedirect(<Redirect to="/unauthenticated_menu/" push />);
+            }}
           >
-            <Button
-              className="btn-sm"
-              onClick={() => {
-                setRedirect(<Redirect to="/unauthenticated_menu/" push />);
-              }}
-            >
-              Connect without account
-            </Button>
-          </OverlayTrigger>
+            Connect without account
+          </Button>
         </Row>
         <Row className="mt-3 justify-content-center">{feedback}</Row>
       </Container>
