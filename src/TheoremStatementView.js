@@ -87,6 +87,7 @@ function TheoremStatementView() {
     <MathQuillElement setValue={setGoal} />
   );
   const [pingPong, setPingPong] = useState(true);
+  const [feedBack, setFeedBack] = useState(<></>);
   useEffect(() => {
     const id = query.get("id");
     if (id) {
@@ -190,6 +191,8 @@ function TheoremStatementView() {
         .then((response) => {
           console.log(response);
           history.replace("/owned_statement?id=" + response.data.id);
+          setFeedBack(<Alert variant="success">Statement updated...</Alert>);
+          setTimeout(() => setFeedBack(<></>), 1000);
           setPingPong(!pingPong);
         })
         .catch((error) => {
@@ -213,6 +216,7 @@ function TheoremStatementView() {
   return (
     <BackBanner to="/list_owned_statements/">
       <WaitingContainer waitVisibility={waitVisibility}>
+        <Row>{feedBack}</Row>
         <Row className="mb-3">
           <Col xs={8}>
             <InputGroup>

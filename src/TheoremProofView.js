@@ -66,6 +66,7 @@ function TheoremProofView() {
   const [leanIndex, setLeanIndex] = useState(-1);
   const [waitVisibility, setWaitVisibility] = useState("invisible");
   const [pingPong, setPingPong] = useState(true);
+  const [feedBack, setFeedBack] = useState(<></>);
   const addProof = (event) => {
     const newProofs = proofs.slice();
     newProofs.push({
@@ -194,6 +195,8 @@ function TheoremProofView() {
     if (id) {
       updateTheoremProof(id, proof)
         .then((response) => {
+          setFeedBack(<Alert variant="success">Proof updated...</Alert>);
+          setTimeout(() => setFeedBack(<></>), 1000);
           setPingPong(!pingPong);
         })
         .catch((error) => console.log(error));
@@ -202,6 +205,7 @@ function TheoremProofView() {
   return (
     <BackBanner to="/list_theorem_proofs/">
       <WaitingContainer waitVisibility={waitVisibility}>
+        <Row>{feedBack}</Row>
         <Row className="mb-3">
           <Col xs={8}>Theorem Name : {name}</Col>
           <Col xs={4}>
