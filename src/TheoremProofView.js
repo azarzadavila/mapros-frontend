@@ -8,7 +8,11 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
-import { askState, getTheoremProof } from "./MainCommunication";
+import {
+  askState,
+  getTheoremProof,
+  updateTheoremProof,
+} from "./MainCommunication";
 import MathQuillElement from "./MathQuillElement";
 import { addStyles, StaticMathField } from "react-mathquill";
 import { useLocation } from "react-router-dom";
@@ -67,6 +71,7 @@ function ProofLine({
   onAskState,
   sentences,
   leanMsg,
+  initItems = [{ id: 0, value: "" }],
 }) {
   let leanAlert;
   if (leanMsg) {
@@ -85,7 +90,7 @@ function ProofLine({
       <Row className="mb-3">
         <Col xs={8}>
           <InputGroup>
-            <MathQuillElement setValue={onChange} />
+            <MathQuillElement setValue={onChange} initItems={initItems} />
             <InputGroup.Append>
               <Button onClick={onDelete}>-</Button>
               <Button onClick={onAskState}>S</Button>
@@ -116,6 +121,26 @@ const genInitHypotheses = (hypotheses) => {
   });
 };
 
+const genInitProofs = (proofs) => {
+  console.log("Proof : " + proofs);
+  const lines = proofs.split("\n");
+  let res = lines.map(preprocessLatex);
+  res = res.map(splitLatex);
+  return res.map((child, ind) => {
+    const toRet = {
+      text: lines[ind],
+      id: lastProof,
+      initItems: child.map((val, index) => {
+        return { id: index, value: val };
+      }),
+      goal: "",
+      sentences: [],
+    };
+    lastProof += 1;
+    return toRet;
+  });
+};
+
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -130,6 +155,7 @@ function TheoremProofView() {
   const [leanError, setLeanError] = useState("NO MESSAGE");
   const [leanIndex, setLeanIndex] = useState(-1);
   const [waitVisibility, setWaitVisibility] = useState("invisible");
+  const [pingPong, setPingPong] = useState(true);
   const deleteFromList = (list, setList) => {
     return (index) => {
       return (event) => {
@@ -142,7 +168,13 @@ function TheoremProofView() {
   };
   const addProof = (event) => {
     const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof, goal: "", sentences: [] });
+    newProofs.push({
+      text: "",
+      id: lastProof,
+      goal: "",
+      sentences: [],
+      initItems: [{ id: 0, value: "" }],
+    });
     setProofs(newProofs);
     lastProof += 1;
   };
@@ -164,6 +196,9 @@ function TheoremProofView() {
       res.push(proofs[i].text);
     }
     return res;
+  };
+  const proofsContentAll = () => {
+    return proofs.map((proof) => proof.text);
   };
   const clearAfter = (index, proofs) => {
     for (let i = index; i < proofs.length; i++) {
@@ -260,6 +295,8 @@ function TheoremProofView() {
           setName(theorem_statement.name);
           setHypotheses(genInitHypotheses(theorem_statement.hypotheses));
           setGoal(theorem_statement.goal);
+          console.log(response.data.proof);
+          setProofs(genInitProofs(response.data.proof));
         })
         .catch((error) => {
           setLeanError(error.message); // TODO
@@ -268,7 +305,7 @@ function TheoremProofView() {
     } else {
       setLeanError("FAILED TO FIND PROOF ID");
     }
-  }, []);
+  }, [pingPong]);
   let leanInitMsg;
   if (leanIndex === -1) {
     leanInitMsg = (
@@ -279,16 +316,31 @@ function TheoremProofView() {
   } else {
     leanInitMsg = <></>;
   }
+  const handleSave = () => {
+    let proof = proofsContentAll();
+    proof = proof.join("\n");
+    const id = query.get("id");
+    if (id) {
+      updateTheoremProof(id, proof)
+        .then((response) => {
+          setPingPong(!pingPong);
+        })
+        .catch((error) => console.log(error));
+    }
+  };
   return (
     <Container>
       <Row className="mb-3">
         <Col xs={8}>Theorem Name : {name}</Col>
         <Col xs={4}>
-          <h2>GOAL STATE</h2>
+          <Button onClick={handleSave}>Save</Button>
         </Col>
       </Row>
       <Row className="mb-3">
         <Col xs={4}>If,</Col>
+        <Col xs={4}>
+          <h2>GOAL STATE</h2>
+        </Col>
       </Row>
       {hypotheses.map((hypothesis, index) => {
         return (
@@ -334,6 +386,7 @@ function TheoremProofView() {
             onAskState={handleAskState(index)}
             sentences={proof.sentences}
             leanMsg={leanMsg}
+            initItems={proof.initItems}
           />
         );
       })}
