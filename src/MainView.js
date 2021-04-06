@@ -12,6 +12,7 @@ import {
   ProofLine,
 } from "./MainViewUtils";
 import WaitingContainer from "./WaitingContainer";
+import { MenuBanner } from "./LinkBanner";
 
 addStyles();
 
@@ -136,88 +137,90 @@ function MainView() {
     leanInitMsg = <></>;
   }
   return (
-    <WaitingContainer waitVisibility={waitVisibility}>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text>Theorem Name :</InputGroup.Text>
-            </InputGroup.Prepend>
-            <Form.Control
-              placeholder="name"
-              aria-label="name"
-              value={name}
-              onChange={onChangeName}
+    <MenuBanner>
+      <WaitingContainer waitVisibility={waitVisibility}>
+        <Row className="mb-3">
+          <Col xs={8}>
+            <InputGroup>
+              <InputGroup.Prepend>
+                <InputGroup.Text>Theorem Name :</InputGroup.Text>
+              </InputGroup.Prepend>
+              <Form.Control
+                placeholder="name"
+                aria-label="name"
+                value={name}
+                onChange={onChangeName}
+              />
+            </InputGroup>
+          </Col>
+          <Col xs={4}>
+            <h2>GOAL STATE</h2>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={4}>
+            If,
+            <Button className="ml-3" onClick={addHypothesis}>
+              +
+            </Button>
+          </Col>
+        </Row>
+        {hypotheses.map((hypothesis, index) => {
+          return (
+            <HypothesisLine
+              ident={hypothesis.ident}
+              text={hypothesis.text}
+              key={hypothesis.id}
+              onChange={handleHypothesisChange(index)}
+              onDelete={handleHypothesisDelete(index)}
             />
-          </InputGroup>
-        </Col>
-        <Col xs={4}>
-          <h2>GOAL STATE</h2>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={4}>
-          If,
-          <Button className="ml-3" onClick={addHypothesis}>
+          );
+        })}
+        <Row>
+          <Col xs={8}>
+            <label>Then,</label>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={8}>
+            <MathQuillElement setValue={setGoal} />
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={8}>
+            Proof:
+            <Button className="ml-3 mb-3" onClick={askStateInitial}>
+              S
+            </Button>
+          </Col>
+          <Goal goal={initialMessage} />
+        </Row>
+        {leanInitMsg}
+        {proofs.map((proof, index) => {
+          let leanMsg = null;
+          if (index === leanIndex) {
+            leanMsg = leanError;
+          }
+          return (
+            <ProofLine
+              text={proof.text}
+              goal={proof.goal}
+              key={proof.id}
+              onChange={handleProofChange(index)}
+              onDelete={handleProofDelete(index)}
+              onAskState={handleAskState(index)}
+              sentences={proof.sentences}
+              leanMsg={leanMsg}
+            />
+          );
+        })}
+        <Row>
+          <Button className="ml-3 mb-3" onClick={addProof}>
             +
           </Button>
-        </Col>
-      </Row>
-      {hypotheses.map((hypothesis, index) => {
-        return (
-          <HypothesisLine
-            ident={hypothesis.ident}
-            text={hypothesis.text}
-            key={hypothesis.id}
-            onChange={handleHypothesisChange(index)}
-            onDelete={handleHypothesisDelete(index)}
-          />
-        );
-      })}
-      <Row>
-        <Col xs={8}>
-          <label>Then,</label>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <MathQuillElement setValue={setGoal} />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={8}>
-          Proof:
-          <Button className="ml-3 mb-3" onClick={askStateInitial}>
-            S
-          </Button>
-        </Col>
-        <Goal goal={initialMessage} />
-      </Row>
-      {leanInitMsg}
-      {proofs.map((proof, index) => {
-        let leanMsg = null;
-        if (index === leanIndex) {
-          leanMsg = leanError;
-        }
-        return (
-          <ProofLine
-            text={proof.text}
-            goal={proof.goal}
-            key={proof.id}
-            onChange={handleProofChange(index)}
-            onDelete={handleProofDelete(index)}
-            onAskState={handleAskState(index)}
-            sentences={proof.sentences}
-            leanMsg={leanMsg}
-          />
-        );
-      })}
-      <Row>
-        <Button className="ml-3 mb-3" onClick={addProof}>
-          +
-        </Button>
-      </Row>
-    </WaitingContainer>
+        </Row>
+      </WaitingContainer>
+    </MenuBanner>
   );
 }
 

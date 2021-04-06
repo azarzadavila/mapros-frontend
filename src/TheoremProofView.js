@@ -18,6 +18,7 @@ import {
   splitLatex,
 } from "./MainViewUtils";
 import WaitingContainer from "./WaitingContainer";
+import { BackBanner } from "./LinkBanner";
 
 addStyles();
 
@@ -199,73 +200,75 @@ function TheoremProofView() {
     }
   };
   return (
-    <WaitingContainer waitVisibility={waitVisibility}>
-      <Row className="mb-3">
-        <Col xs={8}>Theorem Name : {name}</Col>
-        <Col xs={4}>
-          <Button onClick={handleSave}>Save</Button>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={4}>If,</Col>
-        <Col xs={4}>
-          <h2>GOAL STATE</h2>
-        </Col>
-      </Row>
-      {hypotheses.map((hypothesis, index) => {
-        return (
-          <Sentence
-            key={index}
-            ident={hypothesis.ident}
-            sentence={hypothesis.value}
-          />
-        );
-      })}
-      <Row>
-        <Col xs={8}>
-          <label>Then,</label>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <Goal goal={goal} />
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={8}>
-          Proof:
-          <Button className="ml-3 mb-3" onClick={askStateInitial}>
-            S
+    <BackBanner to="/list_theorem_proofs/">
+      <WaitingContainer waitVisibility={waitVisibility}>
+        <Row className="mb-3">
+          <Col xs={8}>Theorem Name : {name}</Col>
+          <Col xs={4}>
+            <Button onClick={handleSave}>Save</Button>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={4}>If,</Col>
+          <Col xs={4}>
+            <h2>GOAL STATE</h2>
+          </Col>
+        </Row>
+        {hypotheses.map((hypothesis, index) => {
+          return (
+            <Sentence
+              key={index}
+              ident={hypothesis.ident}
+              sentence={hypothesis.value}
+            />
+          );
+        })}
+        <Row>
+          <Col xs={8}>
+            <label>Then,</label>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={8}>
+            <Goal goal={goal} />
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={8}>
+            Proof:
+            <Button className="ml-3 mb-3" onClick={askStateInitial}>
+              S
+            </Button>
+          </Col>
+          <Goal goal={initialMessage} />
+        </Row>
+        {leanInitMsg}
+        {proofs.map((proof, index) => {
+          let leanMsg = null;
+          if (index === leanIndex) {
+            leanMsg = leanError;
+          }
+          return (
+            <ProofLine
+              text={proof.text}
+              goal={proof.goal}
+              key={proof.id}
+              onChange={handleProofChange(index)}
+              onDelete={handleProofDelete(index)}
+              onAskState={handleAskState(index)}
+              sentences={proof.sentences}
+              leanMsg={leanMsg}
+              initItems={proof.initItems}
+            />
+          );
+        })}
+        <Row>
+          <Button className="ml-3 mb-3" onClick={addProof}>
+            +
           </Button>
-        </Col>
-        <Goal goal={initialMessage} />
-      </Row>
-      {leanInitMsg}
-      {proofs.map((proof, index) => {
-        let leanMsg = null;
-        if (index === leanIndex) {
-          leanMsg = leanError;
-        }
-        return (
-          <ProofLine
-            text={proof.text}
-            goal={proof.goal}
-            key={proof.id}
-            onChange={handleProofChange(index)}
-            onDelete={handleProofDelete(index)}
-            onAskState={handleAskState(index)}
-            sentences={proof.sentences}
-            leanMsg={leanMsg}
-            initItems={proof.initItems}
-          />
-        );
-      })}
-      <Row>
-        <Button className="ml-3 mb-3" onClick={addProof}>
-          +
-        </Button>
-      </Row>
-    </WaitingContainer>
+        </Row>
+      </WaitingContainer>
+    </BackBanner>
   );
 }
 

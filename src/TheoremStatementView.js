@@ -16,6 +16,7 @@ import {
   splitLatex,
 } from "./MainViewUtils";
 import WaitingContainer from "./WaitingContainer";
+import { BackBanner } from "./LinkBanner";
 
 addStyles();
 
@@ -210,77 +211,79 @@ function TheoremStatementView() {
     return redirect;
   }
   return (
-    <WaitingContainer>
-      <Row className="mb-3">
-        <Col xs={8}>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text>Theorem Name :</InputGroup.Text>
-            </InputGroup.Prepend>
-            <Form.Control
-              placeholder="name"
-              aria-label="name"
-              value={name}
-              onChange={onChangeName}
+    <BackBanner to="/list_owned_statements/">
+      <WaitingContainer waitVisibility={waitVisibility}>
+        <Row className="mb-3">
+          <Col xs={8}>
+            <InputGroup>
+              <InputGroup.Prepend>
+                <InputGroup.Text>Theorem Name :</InputGroup.Text>
+              </InputGroup.Prepend>
+              <Form.Control
+                placeholder="name"
+                aria-label="name"
+                value={name}
+                onChange={onChangeName}
+              />
+            </InputGroup>
+          </Col>
+          <Col xs={2}>
+            <Button onClick={handleSave}>Save</Button>
+          </Col>
+          <Col xs={2}>
+            <Button
+              onClick={() => {
+                const id = query.get("id");
+                const path = "/send_statement?id=" + id;
+                setRedirect(<Redirect to={path} push />);
+              }}
+            >
+              Send
+            </Button>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={4}>
+            If,
+            <Button className="ml-3" onClick={addHypothesis}>
+              +
+            </Button>
+          </Col>
+        </Row>
+        {hypotheses.map((hypothesis, index) => {
+          return (
+            <HypothesisLine
+              ident={hypothesis.ident}
+              text={hypothesis.text}
+              key={hypothesis.id}
+              onChange={handleHypothesisChange(index)}
+              onDelete={handleHypothesisDelete(index)}
+              initItems={hypothesis.initItems}
             />
-          </InputGroup>
-        </Col>
-        <Col xs={2}>
-          <Button onClick={handleSave}>Save</Button>
-        </Col>
-        <Col xs={2}>
-          <Button
-            onClick={() => {
-              const id = query.get("id");
-              const path = "/send_statement?id=" + id;
-              setRedirect(<Redirect to={path} push />);
-            }}
-          >
-            Send
-          </Button>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={4}>
-          If,
-          <Button className="ml-3" onClick={addHypothesis}>
-            +
-          </Button>
-        </Col>
-      </Row>
-      {hypotheses.map((hypothesis, index) => {
-        return (
-          <HypothesisLine
-            ident={hypothesis.ident}
-            text={hypothesis.text}
-            key={hypothesis.id}
-            onChange={handleHypothesisChange(index)}
-            onDelete={handleHypothesisDelete(index)}
-            initItems={hypothesis.initItems}
-          />
-        );
-      })}
-      <Row>
-        <Col xs={8}>
-          <label>Then,</label>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={8}>{initialGoal}</Col>
-      </Row>
-      <Row>
-        <Col xs={8}>
-          Proof:
-          <Button className="ml-3 mb-3" onClick={askStateInitial}>
-            S
-          </Button>
-        </Col>
-        <Goal goal={initialMessage} />
-      </Row>
-      <Alert className="w-100" variant="primary">
-        {leanError}
-      </Alert>
-    </WaitingContainer>
+          );
+        })}
+        <Row>
+          <Col xs={8}>
+            <label>Then,</label>
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={8}>{initialGoal}</Col>
+        </Row>
+        <Row>
+          <Col xs={8}>
+            Proof:
+            <Button className="ml-3 mb-3" onClick={askStateInitial}>
+              S
+            </Button>
+          </Col>
+          <Goal goal={initialMessage} />
+        </Row>
+        <Alert className="w-100" variant="primary">
+          {leanError}
+        </Alert>
+      </WaitingContainer>
+    </BackBanner>
   );
 }
 

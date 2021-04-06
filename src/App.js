@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from "react-router-dom";
 import Menu from "./menu";
 import Login from "./Login";
 import { cookies } from "./Constants";
@@ -13,7 +18,6 @@ import ResetPassword from "./ResetPassword";
 import AskReset from "./AskReset";
 import TestAPI from "./TestAPI";
 import { checkToken } from "./MainCommunication";
-import Switch from "react-bootstrap/Switch";
 import ListOwnedTheoremStatements from "./ListOwnedTheoremStatements";
 import TheoremStatementView from "./TheoremStatementView";
 import SendTheoremStatement from "./SendTheoremStatement";
@@ -52,7 +56,7 @@ function AuthenticatedRoute({ path, component }) {
 function App() {
   return (
     <Router>
-      <Switch>
+      <Switch className="w-100">
         <Route exact={true} path="/">
           <Redirect to="/menu/" />
         </Route>

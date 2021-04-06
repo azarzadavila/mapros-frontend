@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Container, ListGroup, Row } from "react-bootstrap";
-import { listOwnedTheoremStatements, listTheoremProofs } from "./MainCommunication";
+import { listTheoremProofs } from "./MainCommunication";
 import { Redirect } from "react-router-dom";
+import { MenuBanner } from "./LinkBanner";
 
 function ListTheoremProofs() {
   const [children, setChildren] = useState([]);
@@ -35,36 +36,38 @@ function ListTheoremProofs() {
     return redirect;
   }
   return (
-    <Container className="vh-100">
-      <Row className="justify-content-between mt-3 mb-3">
-        <h2>List of theorem statements to prove</h2>
-      </Row>
-      <Row>{feedback}</Row>
-      <Row className="h-75">
-        <ListGroup className="w-100 overflow-auto h-100">
-          {children.map((child) => {
-            return (
-              <ListGroup.Item
-                className="justify-content-between d-flex"
-                key={child.id}
-              >
-                <Button
-                  onClick={() => {
-                    setRedirect(
-                      <Redirect to={"/theorem_proof?id=" + child.id} push />
-                    );
-                  }}
-                  className="w-100 d-flex justify-content-start border-0 bg-transparent text-body"
+    <MenuBanner>
+      <Container className="vh-100">
+        <Row className="justify-content-between mt-3 mb-3">
+          <h2>List of theorem statements to prove</h2>
+        </Row>
+        <Row>{feedback}</Row>
+        <Row className="h-75">
+          <ListGroup className="w-100 overflow-auto h-100">
+            {children.map((child) => {
+              return (
+                <ListGroup.Item
+                  className="justify-content-between d-flex"
+                  key={child.id}
                 >
-                  {child.theorem_statement.name}
-                </Button>
-                <Button className="btn-sm btn-danger">X</Button>
-              </ListGroup.Item>
-            );
-          })}
-        </ListGroup>
-      </Row>
-    </Container>
+                  <Button
+                    onClick={() => {
+                      setRedirect(
+                        <Redirect to={"/theorem_proof?id=" + child.id} push />
+                      );
+                    }}
+                    className="w-100 d-flex justify-content-start border-0 bg-transparent text-body"
+                  >
+                    {child.theorem_statement.name}
+                  </Button>
+                  <Button className="btn-sm btn-danger">X</Button>
+                </ListGroup.Item>
+              );
+            })}
+          </ListGroup>
+        </Row>
+      </Container>
+    </MenuBanner>
   );
 }
 
