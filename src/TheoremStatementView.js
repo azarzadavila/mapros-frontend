@@ -203,6 +203,8 @@ function TheoremStatementView() {
         .then((response) => {
           console.log(response);
           history.replace("/owned_statement?id=" + response.data.id);
+          setFeedBack(<Alert variant="success">Statement created...</Alert>);
+          setTimeout(() => setFeedBack(<></>), 1000);
           setPingPong(!pingPong);
         })
         .catch((error) => {

@@ -23,7 +23,7 @@ function DeleteModal({ onConfirm, onHide }) {
 
       <Modal.Body>
         <p>
-          Are you sure you want to remove the users from the people that can see
+          Are you sure you want to remove this user from the people that can see
           and complete the statement ?
         </p>
       </Modal.Body>
