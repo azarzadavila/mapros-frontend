@@ -78,6 +78,7 @@ function reducerRefs(state, action) {
   }
 }
 const MathQuillElement = ({ setValue, initItems = [{ id: 0, value: "" }] }) => {
+  initItems = initItems ? initItems : [{ id: 0, value: "" }];
   const initialRef = { array: [] };
   const initialState = { lastId: initItems.length, items: initItems };
   const [state, dispatch] = useReducer(reducer, initialState);

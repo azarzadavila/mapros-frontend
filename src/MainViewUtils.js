@@ -84,21 +84,8 @@ export function ProofLine({
   goal,
   onAskState,
   sentences,
-  leanMsg,
   initItems = [{ id: 0, value: "" }],
 }) {
-  let leanAlert;
-  if (leanMsg) {
-    leanAlert = (
-      <Row className="mb-3">
-        <Alert variant="primary" className="w-100">
-          {leanMsg}
-        </Alert>
-      </Row>
-    );
-  } else {
-    leanAlert = <></>;
-  }
   return (
     <>
       <Row className="mb-3">
@@ -120,65 +107,17 @@ export function ProofLine({
           sentence={sentence.sentence}
         />
       ))}
-      {leanAlert}
     </>
   );
 }
 
-export const getChangeWithResponse = (
-  hypotheses,
-  setHypotheses,
-  setInitialMessage,
-  proofs,
-  setLeanIndex,
-  setLeanError,
-  setProofs
-) => {
-  return (data) => {
-    const newHypotheses = hypotheses.slice();
-    data.hypotheses_ident.forEach((ident, index) => {
-      newHypotheses[index] = { ...newHypotheses[index] };
-      newHypotheses[index].ident = ident;
-    });
-    setHypotheses(newHypotheses);
-    setInitialMessage(data.initial_goal);
-    const newProofs = proofs.slice();
-    data.goals.forEach((state, index) => {
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].goal = state;
-    });
-    data.sentences.forEach((cur_sentences, index) => {
-      newProofs[index].sentences = cur_sentences;
-    });
-    clearAfter(data.goals.length, newProofs);
-    setLeanIndex(data.goals.length - 1);
-    if (data.error) {
-      setLeanError(data.error);
-    } else {
-      setLeanError("NO MESSAGE");
-    }
-    setProofs(newProofs);
-  };
-};
-
 export const deleteFromList = (list, setList) => {
   return (index) => {
-    return (event) => {
+    return () => {
       const newListStart = list.slice(0, index);
       const newListEnd = list.slice(index + 1, list.length);
       const newList = newListStart.concat(newListEnd);
       setList(newList);
-    };
-  };
-};
-
-export const getHandleProofChange = (proofs, setProofs) => {
-  return (index) => {
-    return (value) => {
-      const newProofs = proofs.slice();
-      newProofs[index] = { ...newProofs[index] };
-      newProofs[index].text = value;
-      setProofs(newProofs);
     };
   };
 };
