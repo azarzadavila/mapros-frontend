@@ -1,7 +1,8 @@
 import { StaticMathField } from "react-mathquill";
 import React from "react";
-import { Alert, Button, Col, InputGroup, Row } from "react-bootstrap";
+import { Button, Col, InputGroup, Row } from "react-bootstrap";
 import MathQuillElement from "./MathQuillElement";
+import ReadExpression from "./ReadExpression";
 
 export function splitLatex(s) {
   return s.split("$");
@@ -32,29 +33,6 @@ export const clearAfter = (index, proofs) => {
   }
 };
 
-export function Sentence({ ident, sentence }) {
-  return (
-    <Row className="mb-3">
-      <Col xs={8}>
-        <Alert variant="dark">
-          ({ident}) :{" "}
-          {splitLatex(sentence).map((val, index) => getOutput(index, val))}
-        </Alert>
-      </Col>
-    </Row>
-  );
-}
-
-export function Goal({ goal }) {
-  return (
-    <Col xs={4}>
-      <Alert variant="dark">
-        {splitLatex(goal).map((val, index) => getOutput(index, val))}
-      </Alert>
-    </Col>
-  );
-}
-
 export function HypothesisLine({
   ident,
   onChange,
@@ -82,6 +60,7 @@ export function ProofLine({
   onChange,
   onDelete,
   goal,
+  isGoalLean,
   onAskState,
   sentences,
   initItems = [{ id: 0, value: "" }],
@@ -98,14 +77,25 @@ export function ProofLine({
             </InputGroup.Append>
           </InputGroup>
         </Col>
-        <Goal goal={goal} />
+        <Col xs={4}>
+          <ReadExpression variant="goal" isLean={isGoalLean}>
+            {goal}
+          </ReadExpression>
+        </Col>
       </Row>
       {sentences.map((sentence, index) => (
-        <Sentence
-          key={index}
-          ident={sentence.ident}
-          sentence={sentence.sentence}
-        />
+        <Row className="mb-3">
+          <Col xs={8}>
+            <ReadExpression
+              key={index}
+              variant="sentence"
+              isLean={sentence.isLean}
+              ident={sentence.ident}
+            >
+              {sentence.sentence}
+            </ReadExpression>
+          </Col>
+        </Row>
       ))}
     </>
   );

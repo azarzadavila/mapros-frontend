@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   clearAfter,
   deleteFromList,
-  Goal,
   HypothesisLine,
   preprocessLatex,
   ProofLine,
-  Sentence,
   splitLatex,
 } from "./MainViewUtils";
 import Feedback from "./Feedback";
@@ -23,6 +21,7 @@ import WaitingContainer from "./WaitingContainer";
 import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import MathQuillElement from "./MathQuillElement";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
+import ReadExpression from "./ReadExpression";
 
 addStyles();
 function useQuery() {
@@ -59,7 +58,7 @@ function MainViewParent({
   );
   const [feedback, setFeedback] = useState(<></>);
   const [feedbackIndex, setFeedbackIndex] = useState(-1);
-  const [initialGoal, setInitialGoal] = useState("");
+  const [initialGoal, setInitialGoal] = useState({ value: "", isLean: false });
   const [waitVisibility, setWaitVisibility] = useState("invisible");
   const [lastHyp, setLastHyp] = useState(0);
   const [lastProof, setLastProof] = useState(0);
@@ -99,6 +98,7 @@ function MainViewParent({
           return { id: index, value: val };
         }),
         goal: "",
+        isGoalLean: false,
         sentences: [],
       };
       setLastProof(lastProof + 1);
@@ -221,7 +221,13 @@ function MainViewParent({
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
   const addProof = () => {
     const newProofs = proofs.slice();
-    newProofs.push({ text: "", id: lastProof, goal: "", sentences: [] });
+    newProofs.push({
+      text: "",
+      id: lastProof,
+      goal: "",
+      isGoalLean: false,
+      sentences: [],
+    });
     setProofs(newProofs);
     setLastProof(lastProof + 1);
   };
@@ -258,13 +264,14 @@ function MainViewParent({
     const newProofs = proofs.slice();
     data.goals.forEach((state, index) => {
       newProofs[index] = { ...newProofs[index] };
-      newProofs[index].goal = state;
+      newProofs[index].goal = state.value;
+      newProofs[index].isGoalLean = state.isLean;
     });
     data.sentences.forEach((cur_sentences, index) => {
       newProofs[index].sentences = cur_sentences;
     });
     clearAfter(data.goals.length, newProofs);
-    setFeedback(<Feedback variant={data.status} detail={data.feedback} />);
+    setFeedback(<Feedback variant={data.status} detail={data.detail} />);
     setProofs(newProofs);
   };
   const genToSend = (index) => {
@@ -281,22 +288,10 @@ function MainViewParent({
       askState(genToSend(index))
         .then((response) => {
           changeWithResponse(response.data);
-          setFeedback(
-            <Feedback
-              variant={response.data.status}
-              detail={response.data.detail}
-            />
-          );
         })
         .catch((error) => {
           if (error.response && error.response.data.status) {
             changeWithResponse(error.response.data);
-            setFeedback(
-              <Feedback
-                variant={error.response.data.status}
-                detail={error.response.data.detail}
-              />
-            );
           } else if (error.response && error.response.data) {
             setFeedback(
               <Feedback
@@ -323,11 +318,17 @@ function MainViewParent({
   );
   const hypothesisLineReadOnly = (hypothesis, index) => {
     return (
-      <Sentence
-        key={index}
-        ident={hypothesis.ident}
-        sentence={hypothesis.text}
-      />
+      <Row className="mb-3">
+        <Col xs={8}>
+          <ReadExpression
+            key={index}
+            variant="hypothesis"
+            ident={hypothesis.ident}
+          >
+            {hypothesis.text}
+          </ReadExpression>
+        </Col>
+      </Row>
     );
   };
   const hypothesisLineEditable = (hypothesis, index) => {
@@ -345,7 +346,11 @@ function MainViewParent({
   const hypothesisLine = isStatementReadOnly
     ? hypothesisLineReadOnly
     : hypothesisLineEditable;
-  const goalLine = isStatementReadOnly ? <Goal goal={goal} /> : goalInput;
+  const goalLine = isStatementReadOnly ? (
+    <ReadExpression variant="initGoal">{goal}</ReadExpression>
+  ) : (
+    goalInput
+  );
   const proofView = isProofView ? (
     <>
       <Row>Proof:</Row>
@@ -359,6 +364,7 @@ function MainViewParent({
             <ProofLine
               text={proof.text}
               goal={proof.goal}
+              isGoalLean={proof.isGoalLean}
               key={proof.id}
               onChange={handleProofChange(index)}
               onDelete={handleProofDelete(index)}
@@ -464,7 +470,9 @@ function MainViewParent({
           </InputGroup>
         </Col>
         <Col xs={4}>
-          <Goal goal={initialGoal} />
+          <ReadExpression variant="goal" isLean={initialGoal.isLean}>
+            {initialGoal.value}
+          </ReadExpression>
         </Col>
       </Row>
       {initialFeedback}
