@@ -4,8 +4,8 @@ import {
   Button,
   Container,
   ListGroup,
-  Row,
   Modal,
+  Row,
 } from "react-bootstrap";
 import {
   deleteStatement,
@@ -78,11 +78,11 @@ function ListOwnedTheoremStatements() {
   useEffect(refresh, []);
   const handleDelete = (id) => {
     deleteStatement(id)
-      .then((response) => {
+      .then(() => {
         setFeedback(<Alert variant="success">Delete successful...</Alert>);
         setTimeout(() => refresh(), 1000);
       })
-      .catch((error) => {
+      .catch(() => {
         setFeedback(<Alert variant="danger">Failed to delete...</Alert>);
       });
   };

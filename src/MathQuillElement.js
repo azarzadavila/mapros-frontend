@@ -172,7 +172,7 @@ const MathQuillElement = ({ setValue, initItems = [{ id: 0, value: "" }] }) => {
               }
               config={{
                 handlers: {
-                  moveOutOf: (dir, mathField) => {
+                  moveOutOf: (dir) => {
                     if (dir === LEFT) {
                       dispatchRef({ type: "focus", index: index - 1 });
                     } else if (dir === RIGHT) {

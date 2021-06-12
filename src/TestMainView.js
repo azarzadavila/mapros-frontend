@@ -29,14 +29,14 @@ function HypothesisLine({ ident, text, onChange, onDelete }) {
 }
 
 function ProofLine({
-                     text,
-                     onChange,
-                     onDelete,
-                     goal,
-                     onAskState,
-                     sentences,
-                     leanMsg,
-                   }) {
+  text,
+  onChange,
+  onDelete,
+  goal,
+  onAskState,
+  sentences,
+  leanMsg,
+}) {
   let leanAlert;
   if (leanMsg) {
     leanAlert = (
@@ -83,37 +83,87 @@ let lastHyp = 0;
 let lastProof = 0;
 
 const initHypotheses = [
-  {ident: "", text: "$a_n, b_n, c_n$ are real-valued sequences", id: 0},
-  {ident: "", text: "$l \\in \\mathbb{R}$", id: 1},
-  {ident: "", text: "$a_n \\rightarrow l$", id: 2},
-  {ident: "", text: "$c_n \\rightarrow l$", id: 3},
-  {ident: "", text: "$\\forall n : a_n \\leq b_n$", id: 4},
-  {ident: "", text: "$\\forall n : b_n \\leq c_n$", id: 5},
+  { ident: "", text: "$a_n, b_n, c_n$ are real-valued sequences", id: 0 },
+  { ident: "", text: "$l \\in \\mathbb{R}$", id: 1 },
+  { ident: "", text: "$a_n \\rightarrow l$", id: 2 },
+  { ident: "", text: "$c_n \\rightarrow l$", id: 3 },
+  { ident: "", text: "$\\forall n : a_n \\leq b_n$", id: 4 },
+  { ident: "", text: "$\\forall n : b_n \\leq c_n$", id: 5 },
 ];
 
 const initGoal = "$b_n \\rightarrow l$";
 
 const initProofs = [
   { goal: "", id: 0, text: "Let $\\epsilon$", sentences: [] },
-  { goal: "", id: 1, text: "Let's choose $N_a$ such that H1 uses $\\epsilon$", sentences: [] },
-  { goal: "", id: 2, text: "Let's choose $N_c$ such that H2 uses $\\epsilon$", sentences: [] },
+  {
+    goal: "",
+    id: 1,
+    text: "Let's choose $N_a$ such that H1 uses $\\epsilon$",
+    sentences: [],
+  },
+  {
+    goal: "",
+    id: 2,
+    text: "Let's choose $N_c$ such that H2 uses $\\epsilon$",
+    sentences: [],
+  },
   { goal: "", id: 3, text: "Let $N = max(N_a, N_c)$", sentences: [] },
   { goal: "", id: 4, text: "We claim $N$ works", sentences: [] },
-  { goal: "", id: 5, text: "By inequality properties, $N_a \\leq N$", sentences: [] },
-  { goal: "", id: 6, text: "By inequality properties, $N_c \\leq N$", sentences: [] },
+  {
+    goal: "",
+    id: 5,
+    text: "By inequality properties, $N_a \\leq N$",
+    sentences: [],
+  },
+  {
+    goal: "",
+    id: 6,
+    text: "By inequality properties, $N_c \\leq N$",
+    sentences: [],
+  },
   { goal: "", id: 7, text: "Let $n$", sentences: [] },
   { goal: "", id: 8, text: "$a_n \\leq b_n$ by H3 with n", sentences: [] },
   { goal: "", id: 9, text: "$b_n \\leq c_n$ by H4 with n", sentences: [] },
-  { goal: "", id: 10, text: "By inequality properties, $N_a \\leq n$", sentences: [] },
+  {
+    goal: "",
+    id: 10,
+    text: "By inequality properties, $N_a \\leq n$",
+    sentences: [],
+  },
   { goal: "", id: 11, text: "Let's choose n in A2", sentences: [] },
-  { goal: "", id: 12, text: "$|a_n - l| < \\epsilon$ by A10 with A9", sentences: [] },
-  { goal: "", id: 13, text: "By inequality properties, $N_c \\leq n$", sentences: [] },
+  {
+    goal: "",
+    id: 12,
+    text: "$|a_n - l| < \\epsilon$ by A10 with A9",
+    sentences: [],
+  },
+  {
+    goal: "",
+    id: 13,
+    text: "By inequality properties, $N_c \\leq n$",
+    sentences: [],
+  },
   { goal: "", id: 14, text: "Let's choose n in A3", sentences: [] },
-  { goal: "", id: 15, text: "$|c_n - l| < \\epsilon$ by A13 with A12", sentences: [] },
-  { goal: "", id: 16, text: "Let's use absolute value inequality property on A11 A14 and on goal", sentences: [] },
+  {
+    goal: "",
+    id: 15,
+    text: "$|c_n - l| < \\epsilon$ by A13 with A12",
+    sentences: [],
+  },
+  {
+    goal: "",
+    id: 16,
+    text: "Let's use absolute value inequality property on A11 A14 and on goal",
+    sentences: [],
+  },
   { goal: "", id: 17, text: "Let's separate A11", sentences: [] },
   { goal: "", id: 18, text: "Let's separate A14", sentences: [] },
-  { goal: "", id: 19, text: "Let's split the goal and do on all subgoals", sentences: [] },
+  {
+    goal: "",
+    id: 19,
+    text: "Let's split the goal and do on all subgoals",
+    sentences: [],
+  },
   { goal: "", id: 20, text: "By linear arithmetic", sentences: [] },
 ];
 
@@ -131,7 +181,7 @@ function TestMainView() {
   const onChangeGoal = (event) => {
     setGoal(event.target.value);
   };
-  const addHypothesis = (event) => {
+  const addHypothesis = () => {
     const newHypotheses = hypotheses.slice();
     newHypotheses.push({ ident: "", text: "", id: lastHyp });
     setHypotheses(newHypotheses);
@@ -147,7 +197,7 @@ function TestMainView() {
   };
   const deleteFromList = (list, setList) => {
     return (index) => {
-      return (event) => {
+      return () => {
         const newListStart = list.slice(0, index);
         const newListEnd = list.slice(index + 1, list.length);
         const newList = newListStart.concat(newListEnd);
@@ -156,7 +206,7 @@ function TestMainView() {
     };
   };
   const handleHypothesisDelete = deleteFromList(hypotheses, setHypotheses);
-  const addProof = (event) => {
+  const addProof = () => {
     const newProofs = proofs.slice();
     newProofs.push({ text: "", id: lastProof, goal: "", sentences: [] });
     setProofs(newProofs);
@@ -213,13 +263,6 @@ function TestMainView() {
     setProofs(newProofs);
   };
 
-  const updateState = (index, state) => {
-    const newProofs = proofs.slice();
-    newProofs[index] = { ...newProofs[index] };
-    newProofs[index].goal = state;
-    setProofs(newProofs);
-  };
-
   const genToSend = (index) => {
     return {
       name: name,
@@ -229,7 +272,7 @@ function TestMainView() {
     };
   };
 
-  const askStateInitial = (event) => {
+  const askStateInitial = () => {
     const toSend = genToSend(-1);
     askState(toSend)
       .then((response) => changeWithResponse(response.data))
@@ -246,7 +289,7 @@ function TestMainView() {
   };
 
   const handleAskState = (index) => {
-    return (event) => {
+    return () => {
       const toSend = genToSend(index);
       askState(toSend)
         .then((response) => changeWithResponse(response.data))

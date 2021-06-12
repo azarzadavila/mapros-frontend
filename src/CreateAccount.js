@@ -38,7 +38,7 @@ function CreateAccount() {
     event.preventDefault(); // prevents the url to change directly
     setIsDisabled(true);
     createAccount(firstName, lastName, email, password)
-      .then((response) => {
+      .then(() => {
         setSuccess();
       })
       .catch((error) => {

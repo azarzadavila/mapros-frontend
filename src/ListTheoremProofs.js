@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Container, ListGroup, Row } from "react-bootstrap";
+import { Alert, Container, ListGroup, Row } from "react-bootstrap";
 import { listTheoremProofs } from "./MainCommunication";
 import { Redirect } from "react-router-dom";
 import { MenuBanner } from "./LinkBanner";

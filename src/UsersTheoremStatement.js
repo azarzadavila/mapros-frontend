@@ -100,7 +100,7 @@ function UsersTheoremStatement() {
       <Row>{feedback}</Row>
       <Row className="h-75">
         <ListGroup className="w-100 overflow-auto h-100">
-          {children.map((child, index) => {
+          {children.map((child) => {
             const user = child.user;
             return (
               <ListGroup.Item

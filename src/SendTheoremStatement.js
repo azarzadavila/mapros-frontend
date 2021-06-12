@@ -1,28 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Alert, Button, Container, ListGroup, Row } from "react-bootstrap";
 import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  ListGroup,
-  Row,
-  Spinner,
-} from "react-bootstrap";
-import {
-  askState,
-  createTheoremStatement,
-  getOwnedTheoremStatement,
-  getTheoremStatement,
-  listOwnedTheoremStatements,
   listUsersNotAssignedStatement,
   sendStatement,
-  updateTheoremStatement,
 } from "./MainCommunication";
-import MathQuillElement from "./MathQuillElement";
-import { addStyles, StaticMathField } from "react-mathquill";
-import { Redirect, useLocation, useHistory } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -68,7 +50,7 @@ function SendTheoremStatement() {
     const usersToSend = users.filter((u) => u.checked).map((u) => u.id);
     const statementId = query.get("id");
     sendStatement(statementId, usersToSend)
-      .then((response) => {
+      .then(() => {
         setFeedback(<Alert variant="success">Statement sent...</Alert>);
         setTimeout(() => {
           setRedirect(

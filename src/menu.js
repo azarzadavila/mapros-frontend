@@ -8,7 +8,6 @@ import { Redirect } from "react-router-dom";
 import { cookies } from "./Constants";
 import { MenuItem } from "./MenuUtils";
 
-
 function Menu() {
   const [redirect, setRedirect] = useState(null);
   const logOut = () => {

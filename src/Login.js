@@ -1,15 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Alert,
-  Button,
-  Col,
-  Container,
-  Form,
-  OverlayTrigger,
-  Row,
-  Tooltip,
-} from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { cookies } from "./Constants";
 import { authenticate } from "./MainCommunication";
